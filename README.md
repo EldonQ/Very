@@ -44,11 +44,11 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 > 一行命令，把地理栅格数据画成规范、好看、能直接进论文的中国地图。
 
 <div align="center">
-<img src="skills/geo-viz/promo/wechat/images/demo_temperature.png" width="46%" alt="连续场示例：年均温"/>
+<img src="skills/geo-viz/examples/example_soil_ph.png" width="46%" alt="发散配色示例：土壤 pH"/>
 &nbsp;&nbsp;
-<img src="skills/geo-viz/promo/wechat/images/demo_landcover.png" width="46%" alt="离散分类示例：土地覆盖"/>
+<img src="skills/geo-viz/examples/example_ndvi.png" width="46%" alt="顺序配色示例：最大 NDVI"/>
 <br/>
-<sub>左：连续场（年均温，含右下角南海小地图）　·　右：离散分类（土地覆盖 9 类）</sub>
+<sub>使用本技能对真实环境栅格渲染的实测结果　·　左：土壤 pH（发散配色）　·　右：最大 NDVI（顺序配色），均含右下角南海小地图</sub>
 </div>
 
 <br/>
@@ -90,6 +90,7 @@ Very/
 │       ├── scripts/            render_china_map.{py,R} + requirements.txt
 │       ├── assets/china/       内置底图（省界 / 九段线，WGS-84）
 │       ├── references/         配色键与地类定义
+│       ├── examples/           实测示例图（真实数据渲染结果）
 │       ├── tests/              自包含冒烟测试
 │       └── promo/              三平台宣传物料（抖音 / 小红书 / 公众号）
 ├── .gitignore

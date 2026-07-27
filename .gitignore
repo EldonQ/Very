@@ -2,6 +2,7 @@
 skills/geo-viz/tests/_out/
 **/_out/
 **/_cache/
+**/_valid/
 
 # Python
 __pycache__/

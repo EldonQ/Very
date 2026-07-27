@@ -30,6 +30,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+# Unified typography so every text element (title, legend, colourbar) shares one
+# font family and a consistent size scale across all rendered maps.
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["DejaVu Sans", "Arial", "Helvetica"],
+    "axes.titlesize": 13,
+    "figure.autolayout": False,
+})
 from matplotlib.colors import BoundaryNorm, LinearSegmentedColormap, ListedColormap
 from matplotlib.patches import Patch
 
@@ -67,8 +76,8 @@ _PALETTES = {
     "height": ("YlGn", False),
     "terrain": ("terrain", False),
     "hydro": ("YlGnBu", False),
-    "pop": ("inferno", False),
-    "human": ("magma", False),
+    "pop": ("inferno", True),
+    "human": ("magma", True),
     "emf": ("viridis", False),
     "precip": ("YlGnBu", False),
     "seasonal": ("viridis", False),
@@ -219,7 +228,10 @@ def render(arr, extent, china, dashline, out_base, title, legend_title,
 
     ax.set_xlim(china_bounds[0], china_bounds[2])
     ax.set_ylim(china_bounds[1], china_bounds[3])
-    ax.set_aspect("equal")
+    # Latitude-corrected aspect so China keeps true geographic proportions in
+    # EPSG:4326 (matches ggplot2 coord_sf; a plain "equal" aspect stretches it).
+    mean_lat = 0.5 * (china_bounds[1] + china_bounds[3])
+    ax.set_aspect(1.0 / np.cos(np.deg2rad(mean_lat)))
     ax.axis("off")
     if title:
         ax.set_title(title, fontsize=13, fontweight="bold", pad=6)
@@ -261,7 +273,7 @@ def _add_scs_inset(ax, arr, extent, china, dashline, cmap, norm, vmin, vmax,
         dashline.plot(ax=axins, color=BORDER_COL, linewidth=0.25)
     axins.set_xlim(*INSET_XLIM)
     axins.set_ylim(*INSET_YLIM)
-    axins.set_aspect("equal")
+    axins.set_aspect(1.0 / np.cos(np.deg2rad(0.5 * (INSET_YLIM[0] + INSET_YLIM[1]))))
     axins.set_xticks([])
     axins.set_yticks([])
     for spine in axins.spines.values():
