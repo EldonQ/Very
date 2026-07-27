@@ -1,0 +1,14 @@
+# Test / render outputs
+skills/geo-viz/tests/_out/
+**/_out/
+**/_cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.Rhistory
+.RData
+.DS_Store
+Thumbs.db
