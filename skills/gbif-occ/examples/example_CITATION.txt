@@ -1,0 +1,6 @@
+GBIF Occurrence Download  10.15468/dl.kmmt73
+下载 key : 0015068-260721160103020
+记录数   : 244704
+生成时间 : 2026-07-28T10:15:49.198+00:00
+检索条件 : taxonKey ∈ 全部鱼类(见 reference/fish_taxa_keys.csv)  AND  country ∈ CN, HK, MO, TW  AND  hasCoordinate=TRUE  AND  hasGeospatialIssue=FALSE
+访问地址 : https://www.gbif.org/occurrence/download/0015068-260721160103020

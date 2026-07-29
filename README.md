@@ -8,7 +8,7 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 
 <br/>
 
-[![Skills](https://img.shields.io/badge/skills-1-4E5963?style=flat-square)](#-技能目录)
+[![Skills](https://img.shields.io/badge/skills-2-4E5963?style=flat-square)](#-技能目录)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](#)
 [![R](https://img.shields.io/badge/R-276DC3?style=flat-square&logo=r&logoColor=white)](#)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](#-许可)
@@ -34,6 +34,7 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 | 技能 | 说明 | 引擎 | 状态 |
 |------|------|------|------|
 | [**geo-viz**](skills/geo-viz) | 把栅格数据（GeoTIFF）渲染成出版级中国地图，自动带南海九段线 + 小地图、Nature 级配色、600dpi 透明 PNG + 矢量 PDF | Python / R | ✅ 稳定 |
+| [**gbif-occ**](skills/gbif-occ) | 从 GBIF 大规模下载物种出现记录：把任意类群（含「鱼类」这类非单一节点的并系群）解析为完整 taxonKey、核查分类学全覆盖、异步全量下载并留存 DOI，出数据展示/分析图，附中国四地淡水鱼一键预设 | R | ✅ 稳定 |
 
 <sub>更多技能开发中，见 [路线图](#-路线图)。</sub>
 
@@ -82,17 +83,65 @@ Rscript skills/geo-viz/scripts/render_china_map.R \
 
 ---
 
+## ⭐ 精选：gbif-occ
+
+> 把「我要 *这些类群* 在 *这个地区* 的全部记录」变成一份干净、可引用、可视化的出现数据集。
+
+<div align="center">
+<img src="skills/gbif-occ/examples/figures/china_fish_map.png" width="46%" alt="出现点空间密度图"/>
+&nbsp;&nbsp;
+<img src="skills/gbif-occ/examples/figures/china_fish_summary.png" width="46%" alt="数据集概览四面板"/>
+<br/>
+<sub>用本技能对真实下载数据（16.6 万条中国四地淡水鱼记录）的实测出图　·　左：出现点空间密度（六边形分箱，log 计数）叠合规中国底图（省界 + 南海九段线 + 南海小地图）　·　右：概览四面板（Top 物种 / 各地区 / Top 目 / 年度趋势）</sub>
+</div>
+
+<br/>
+
+从一次真实生产任务（下载中国大陆 + 港澳台全部淡水鱼记录）沉淀而来，解决 `occ_search()` 做不到的四件事：
+
+- 🧬 **完整类群解析** —— 许多类群**不是单一骨干节点**。「鱼类」是并系群，GBIF 把辐鳍鱼各目直接挂在 Chordata 下、无统一纲；本技能自动枚举正确的目/纲集合成 `taxonKey` 清单
+- 🔍 **分类学全覆盖核查** —— 自骨干库自上而下审计：目标目/纲有无遗漏、门下有无「带现生记录却逃逸出清单」的科/属（排除化石）
+- 🌐 **大规模 + 可引用** —— 走**异步 Occurrence Download API**（整库导出，非 10 万条上限），等待归档、解压、留存可引用 **DOI**
+- 📊 **数据展示 / 分析可视化** —— 一步出**出现点空间密度图**（叠合规中国底图：省界 + 南海九段线 + 南海小地图） + **数据集概览四面板**（+ 可选 FishBase 栖息地构成图），600dpi PNG，通用于任意类群/地区
+- 🐟 **淡水过滤（可选）** —— 用 FishBase 栖息地属性剔除纯海洋种，保守保留未知/无种名记录
+- 🚀 **一键预设** —— `china_freshwater_fish` 复现整套流程；改预设即可派生你自己的类群/地区
+
+**快速上手**
+
+```bash
+# 旗舰预设：解析鱼类 key → 覆盖核查 → 异步下载 → FishBase 淡水过滤 → 出图
+Rscript skills/gbif-occ/scripts/run_preset.R --preset china_freshwater_fish --out gbif_out
+
+# 或分步用于任意类群/地区（解析、核查、可视化均无需账号）
+Rscript skills/gbif-occ/scripts/resolve_keys.R --preset fish --out keys.csv
+Rscript skills/gbif-occ/scripts/download.R --keys-file keys.csv --region CN,HK,MO,TW --out gbif_out
+Rscript skills/gbif-occ/scripts/visualize.R --occ gbif_out/processed/occurrences_freshwater.csv --out gbif_out/figures/fish
+```
+
+下载需免费 GBIF 账号（`.env` 提供 `GBIF_USER/GBIF_PWD/GBIF_EMAIL`，仅从环境读取、绝不落盘）。
+完整用法见 [skills/gbif-occ/SKILL.md](skills/gbif-occ/SKILL.md)。
+
+---
+
 ## 🗂 仓库结构
 
 ```
 Very/
 ├── skills/                     所有技能
-│   └── geo-viz/                中国栅格地图渲染
+│   ├── geo-viz/                中国栅格地图渲染
+│   │   ├── SKILL.md            技能说明（能力 / CLI / 原理）
+│   │   ├── scripts/            render_china_map.{py,R} + requirements.txt
+│   │   ├── assets/china/       内置底图（省界 / 九段线，WGS-84）
+│   │   ├── references/         配色键与地类定义
+│   │   ├── examples/           实测示例图（真实数据渲染结果）
+│   │   └── tests/              自包含冒烟测试
+│   └── gbif-occ/               GBIF 物种出现记录下载
 │       ├── SKILL.md            技能说明（能力 / CLI / 原理）
-│       ├── scripts/            render_china_map.{py,R} + requirements.txt
-│       ├── assets/china/       内置底图（省界 / 九段线，WGS-84）
-│       ├── references/         配色键与地类定义
-│       ├── examples/           实测示例图（真实数据渲染结果）
+│       ├── scripts/            resolve_keys / verify_coverage / download / filter_habitat / visualize / run_preset / common
+│       ├── assets/china/       内置合规中国底图（省界 / 九段线，WGS-84）
+│       ├── presets/            旗舰预设（中国四地淡水鱼）
+│       ├── references/         GBIF 知识与坑位
+│       ├── examples/           真实产物（taxonKey / 引用 DOI / 出现样本 / 实测图 figures/）
 │       └── tests/              自包含冒烟测试
 ├── .gitignore
 └── README.md
@@ -113,7 +162,8 @@ Very/
    ```
 4. **运行脚本 / 跑测试** 验证环境：
    ```bash
-   python skills/geo-viz/tests/test_render.py   # RESULT: PASS
+   python skills/geo-viz/tests/test_render.py     # RESULT: PASS
+   Rscript skills/gbif-occ/tests/test_smoke.R     # RESULT: PASS
    ```
 
 ---
@@ -132,6 +182,7 @@ Very/
 ## 🛣 路线图
 
 - [x] `geo-viz` — 中国栅格地图渲染（Python + R）
+- [x] `gbif-occ` — GBIF 物种出现记录大规模下载、分类学覆盖核查与数据可视化（R）
 - [ ] 更多科研可视化技能（时序、多面板拼图、专题制图模板）
 - [ ] 数据处理 / 自动化工作流类技能
 - [ ] 技能索引与统一调用入口
