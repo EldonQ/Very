@@ -91,8 +91,7 @@ Very/
 │       ├── assets/china/       内置底图（省界 / 九段线，WGS-84）
 │       ├── references/         配色键与地类定义
 │       ├── examples/           实测示例图（真实数据渲染结果）
-│       ├── tests/              自包含冒烟测试
-│       └── promo/              三平台宣传物料（抖音 / 小红书 / 公众号）
+│       └── tests/              自包含冒烟测试
 ├── .gitignore
 └── README.md
 ```

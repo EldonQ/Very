@@ -4,6 +4,9 @@ skills/geo-viz/tests/_out/
 **/_cache/
 **/_valid/
 
+# Publishing assets (kept local only, separate from the skill)
+/promo/
+
 # Python
 __pycache__/
 *.pyc
