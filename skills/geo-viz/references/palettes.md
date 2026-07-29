@@ -1,10 +1,29 @@
 # geo-viz — Palette & Class Reference
 
-## Continuous palette keys
+Run `--list-palettes` on either engine to print this catalogue at any time. Names
+resolve in this order: **Nature-grade themes → semantic keys → native colormap**.
+Add `--reverse` to flip any palette; add `--midpoint VALUE` to centre a diverging one.
 
-Each key maps to a colour ramp in both engines. Python uses a matplotlib colormap
-(reversed where noted); R uses `grDevices::hcl.colors` with the equivalent scheme.
-"High end" is the colour assigned to large values.
+## Nature-grade themes (identical in both engines)
+
+These themes are defined by **explicit hex control points that are byte-for-byte
+identical in `render_china_map.py` and `render_china_map.R`**, so a figure renders in
+the exact same colours whichever engine you use. All are colour-blind-friendly.
+
+| Family | Names | Direction |
+|--------|-------|-----------|
+| Sequential | `blues`, `greens`, `purples`, `oranges`, `reds`, `teal`, `ylgnbu`, `ylorrd`, `mako`, `rocket` | light → dark |
+| Diverging | `rdbu`, `rdylbu`, `spectral`, `brbg`, `puor`, `prgn` | low → neutral → high |
+| Perceptually-uniform | `viridis`, `cividis`, `inferno`, `plasma` | light → dark |
+
+Diverging themes pair with `--midpoint` (e.g. `--midpoint 0`) to anchor the neutral
+colour at a meaningful value — ideal for anomalies, trends, or differences.
+
+## Semantic continuous keys
+
+Each key maps to a colour ramp in both engines, chosen to suit a variable type.
+Python uses a matplotlib colormap (reversed where noted); R uses the equivalent
+`grDevices::hcl.colors` scheme. "High end" is the colour assigned to large values.
 
 | Key | Suggested variables | Ramp (low → high) |
 |-----|--------------------|-------------------|
@@ -33,8 +52,11 @@ Each key maps to a colour ramp in both engines. Python uses a matplotlib colorma
 | `diversity` | landscape (Shannon) diversity | viridis |
 | `edge` | edge density | purple-red |
 
-Any value not listed is passed through unchanged as a native colormap name
-(matplotlib name for Python; `hcl.colors` palette name for R).
+Any value that is not a theme or a semantic key is treated as a **native colormap
+name**: a matplotlib colormap for Python, or a `grDevices::hcl.colors` palette for R.
+Native names may differ slightly between engines and unknown names raise a clear error
+(the R engine lists valid options) — prefer a theme name when cross-engine consistency
+matters.
 
 ## Discrete class definitions (`--mode class --classes <name>`)
 

@@ -3,7 +3,7 @@
 """
 geo-viz · Render a raster over a standards-compliant China basemap (Python).
 
-Effect (ported from the CHECO26 slide2 R pipeline):
+Effect (distilled from a production research-visualization pipeline):
   - China boundary (china.shp) + South China Sea nine-dash line (dashline.shp)
   - South China Sea inset in the bottom-right corner
   - Nature-style, colour-blind-friendly palettes (continuous + discrete classes)
@@ -39,7 +39,12 @@ plt.rcParams.update({
     "axes.titlesize": 13,
     "figure.autolayout": False,
 })
-from matplotlib.colors import BoundaryNorm, LinearSegmentedColormap, ListedColormap
+from matplotlib.colors import (
+    BoundaryNorm,
+    LinearSegmentedColormap,
+    ListedColormap,
+    Normalize,
+)
 from matplotlib.patches import Patch
 
 try:
@@ -94,6 +99,36 @@ _PALETTES = {
     "accum": ("YlGnBu", False),
 }
 
+# Perceptually uniform, colour-blind-safe native colormaps (identical maths in
+# both engines). Exposed as first-class theme names alongside THEMES.
+PERCEPTUAL = ("viridis", "cividis", "inferno", "plasma")
+
+# Nature-grade themes defined by EXPLICIT hex control points. The R engine ships
+# the byte-for-byte identical stops, so both backends interpolate the exact same
+# colours. Sequential ramps run light -> dark; the names in DIVERGING run
+# low -> neutral -> high and pair with --midpoint for a centred zero.
+THEMES = {
+    # -- sequential ---------------------------------------------------------
+    "blues":   ["#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08306B"],
+    "greens":  ["#F7FCF5", "#E5F5E0", "#C7E9C0", "#A1D99B", "#74C476", "#41AB5D", "#238B45", "#006D2C", "#00441B"],
+    "purples": ["#FCFBFD", "#EFEDF5", "#DADAEB", "#BCBDDC", "#9E9AC8", "#807DBA", "#6A51A3", "#54278F", "#3F007D"],
+    "oranges": ["#FFF5EB", "#FEE6CE", "#FDD0A2", "#FDAE6B", "#FD8D3C", "#F16913", "#D94801", "#A63603", "#7F2704"],
+    "reds":    ["#FFF5F0", "#FEE0D2", "#FCBBA1", "#FC9272", "#FB6A4A", "#EF3B2C", "#CB181D", "#A50F15", "#67000D"],
+    "teal":    ["#F7FCFD", "#E5F5F9", "#CCECE6", "#99D8C9", "#66C2A4", "#41AE76", "#238B45", "#006D2C", "#00441B"],
+    "ylgnbu":  ["#FFFFD9", "#EDF8B1", "#C7E9B4", "#7FCDBB", "#41B6C4", "#1D91C0", "#225EA8", "#253494", "#081D58"],
+    "ylorrd":  ["#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"],
+    "mako":    ["#D5F0EA", "#9FDCCB", "#5FB3A3", "#2E8289", "#1E4F6B", "#16263F"],
+    "rocket":  ["#FBE6C8", "#F6A97A", "#E85D5D", "#B5305F", "#6E1A55", "#2C0B2E"],
+    # -- diverging (low -> neutral -> high) ---------------------------------
+    "rdbu":     ["#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F"],
+    "rdylbu":   ["#313695", "#4575B4", "#74ADD1", "#ABD9E9", "#E0F3F8", "#FFFFBF", "#FEE090", "#FDAE61", "#F46D43", "#D73027", "#A50026"],
+    "spectral": ["#3288BD", "#66C2A5", "#ABDDA4", "#E6F598", "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142"],
+    "brbg":     ["#543005", "#8C510A", "#BF812D", "#DFC27D", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#80CDC1", "#35978F", "#01665E", "#003C30"],
+    "puor":     ["#7F3B08", "#B35806", "#E08214", "#FDB863", "#FEE0B6", "#F7F7F7", "#D8DAEB", "#B2ABD2", "#8073AC", "#542788", "#2D004B"],
+    "prgn":     ["#40004B", "#762A83", "#9970AB", "#C2A5CF", "#E7D4E8", "#F7F7F7", "#D9F0D3", "#A6DBA0", "#5AAE61", "#1B7837", "#00441B"],
+}
+DIVERGING = {"rdbu", "rdylbu", "spectral", "brbg", "puor", "prgn"}
+
 # Discrete land-cover class definitions (codes / labels / colours).
 CLASS_DEFS = {
     "clcd": {
@@ -126,13 +161,22 @@ CLASS_DEFS = {
 }
 
 
-def get_cmap(name: str):
-    """Return a matplotlib colormap for a palette key or a raw colormap name."""
-    if name in _PALETTES:
+def get_cmap(name: str, reverse: bool = False):
+    """Resolve a colormap from a Nature theme, a semantic key, or a native name.
+
+    Resolution order: explicit-hex THEMES -> semantic _PALETTES -> matplotlib
+    built-in name. ``reverse`` flips whichever colormap was resolved.
+    """
+    if name in THEMES:
+        cmap = LinearSegmentedColormap.from_list(name, THEMES[name], N=256)
+    elif name in _PALETTES:
         cmap_name, rev = _PALETTES[name]
         cmap = plt.get_cmap(cmap_name)
-        return cmap.reversed() if rev else cmap
-    return plt.get_cmap(name)
+        if rev:
+            cmap = cmap.reversed()
+    else:
+        cmap = plt.get_cmap(name)
+    return cmap.reversed() if reverse else cmap
 
 
 # --------------------------------------------------------------------------
@@ -175,7 +219,7 @@ def prepare_raster(input_path, china_geoms, band, mode, src_nodata):
 # Plotting
 # --------------------------------------------------------------------------
 def _draw_layer(ax, arr, extent, cmap, norm, vmin, vmax, discrete):
-    if discrete:
+    if discrete or norm is not None:
         return ax.imshow(arr, extent=extent, origin="upper", cmap=cmap,
                          norm=norm, interpolation="nearest")
     return ax.imshow(arr, extent=extent, origin="upper", cmap=cmap,
@@ -183,13 +227,14 @@ def _draw_layer(ax, arr, extent, cmap, norm, vmin, vmax, discrete):
 
 
 def render(arr, extent, china, dashline, out_base, title, legend_title,
-           palette, mode, classes, limits, clamp, width, height, dpi):
+           palette, mode, classes, limits, clamp, reverse, midpoint,
+           width, height, dpi):
     china_bounds = china.total_bounds  # minx, miny, maxx, maxy
     discrete = mode == "class"
 
     # ---- colour scale -----------------------------------------------------
     norm = vmin = vmax = None
-    cmap = get_cmap(palette)
+    cmap = get_cmap(palette, reverse=reverse)
     legend_handles = None
     if discrete:
         cdef = CLASS_DEFS[classes]
@@ -215,6 +260,19 @@ def render(arr, extent, china, dashline, out_base, title, legend_title,
                 vmin, vmax = np.percentile(finite, [2, 98])
                 if not np.isfinite(vmin) or vmin == vmax:
                     vmin, vmax = np.nanmin(arr), np.nanmax(arr)
+        if midpoint is not None:
+            finite = arr[np.isfinite(arr)]
+            lo = vmin if vmin is not None else (
+                float(np.nanmin(arr)) if finite.size else 0.0)
+            hi = vmax if vmax is not None else (
+                float(np.nanmax(arr)) if finite.size else 1.0)
+            half = max(abs(lo - midpoint), abs(hi - midpoint))
+            if half > 0:
+                # Symmetric centring on ``midpoint`` (midpoint -> mid colour),
+                # matching R's scales::rescale_mid so both engines colour
+                # identically even when the midpoint sits outside the data.
+                norm = Normalize(vmin=midpoint - half, vmax=midpoint + half)
+                vmin = vmax = None
 
     # ---- main figure ------------------------------------------------------
     fig, ax = plt.subplots(figsize=(width, height))
@@ -300,18 +358,37 @@ def load_basemap(assets_dir):
     return china, dashline
 
 
+def print_palettes():
+    """Print every available palette name grouped by family, then exit."""
+    seq = [k for k in THEMES if k not in DIVERGING]
+    div = [k for k in THEMES if k in DIVERGING]
+    print("Nature-grade themes (byte-for-byte identical in Python and R):")
+    print("  sequential :", ", ".join(seq))
+    print("  diverging  :", ", ".join(div), "   (pair with --midpoint)")
+    print("  perceptual :", ", ".join(PERCEPTUAL))
+    print("Semantic keys (auto-picked by variable type):")
+    print(" ", ", ".join(sorted(_PALETTES)))
+    print("Any matplotlib colormap name also works. Add --reverse to flip.")
+
+
 def parse_args(argv=None):
     p = argparse.ArgumentParser(
         description="Render a raster over a China basemap (nine-dash line + SCS inset)."
     )
-    p.add_argument("--input", required=True, help="Input GeoTIFF raster path.")
-    p.add_argument("--output", required=True,
+    p.add_argument("--input", help="Input GeoTIFF raster path.")
+    p.add_argument("--output",
                    help="Output path base (without extension); .png and .pdf are written.")
     p.add_argument("--title", default="", help="Map title.")
     p.add_argument("--legend", default="", help="Legend / colourbar title.")
     p.add_argument("--palette", default="viridis",
-                   help="Palette key (%s) or any matplotlib colormap." %
-                        ", ".join(sorted(_PALETTES)))
+                   help="Theme/semantic key or any matplotlib colormap "
+                        "(run --list-palettes to see them all).")
+    p.add_argument("--reverse", action="store_true",
+                   help="Reverse the chosen palette.")
+    p.add_argument("--midpoint", type=float, default=None,
+                   help="Centre a diverging palette on this value (e.g. 0).")
+    p.add_argument("--list-palettes", action="store_true",
+                   help="List every available palette name and exit.")
     p.add_argument("--mode", choices=["continuous", "class"], default="continuous",
                    help="Continuous field or discrete class raster.")
     p.add_argument("--classes", choices=sorted(CLASS_DEFS), default="clcd",
@@ -336,6 +413,11 @@ def parse_args(argv=None):
 
 def main(argv=None):
     args = parse_args(argv)
+    if args.list_palettes:
+        print_palettes()
+        return
+    if not args.input or not args.output:
+        raise SystemExit("--input and --output are required (or use --list-palettes).")
     if not os.path.exists(args.input):
         raise SystemExit("Input raster not found: %s" % args.input)
     china, dashline = load_basemap(args.assets)
@@ -348,7 +430,7 @@ def main(argv=None):
     render(
         arr, extent, china, dashline, args.output, args.title, args.legend,
         args.palette, args.mode, args.classes, args.limits, args.clamp,
-        args.width, args.height, args.dpi,
+        args.reverse, args.midpoint, args.width, args.height, args.dpi,
     )
 
 

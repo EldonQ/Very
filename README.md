@@ -57,10 +57,12 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 
 - 🌏 **自动化流程** —— 重投影至 EPSG:4326、按中国边界掩膜、2–98 分位截断防离群值
 - 🧩 **合规底图** —— 中国省界 + 南海九段线，右下角自动生成南海诸岛小地图
-- 🎨 **Nature 级配色** —— 20+ 语义化色盲友好色带，按变量类型（温度/降水/植被/高程/人口…）选色
+- 🎨 **多套 Nature 级配色任选** —— 顺序 / 发散 / 感知均匀三大类色盲友好主题（`blues`·`spectral`·`viridis`…），另有 20+ 按变量类型自动选色的语义键；`--reverse` 翻转、`--midpoint` 居中发散配色（异常/趋势图利器），`--list-palettes` 一览全部
+- 🎯 **双引擎同色** —— 主题以显式 hex 控制点定义，Python 与 R 渲染出**完全一致**的颜色
 - 📊 **连续 + 离散** —— 连续场自动渐变，分类数据自动图例（CLCD 9 类等）
 - 🖨️ **出版级输出** —— 600dpi 透明 PNG + 矢量 PDF，论文 / PPT 直接用
 - 🔁 **双引擎** —— Python（`rasterio/geopandas/matplotlib`）与 R（`terra/sf/ggplot2`），CLI 参数完全一致
+- 📦 **数据无关** —— 传入你自己的任意 GeoTIFF 即可出图，不依赖任何私有数据集
 
 **快速上手**
 
@@ -76,7 +78,7 @@ Rscript skills/geo-viz/scripts/render_china_map.R \
     --title "Annual Mean Temperature" --legend "degC" --palette temp --clamp
 ```
 
-完整用法见 [skills/geo-viz/SKILL.md](skills/geo-viz/SKILL.md)。
+完整用法见 [skills/geo-viz/SKILL.md](skills/geo-viz/SKILL.md)；运行 `--list-palettes` 可查看全部配色主题。
 
 ---
 

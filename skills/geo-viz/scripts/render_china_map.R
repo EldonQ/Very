@@ -2,7 +2,7 @@
 # =============================================================================
 # geo-viz - Render a raster over a standards-compliant China basemap (R).
 # -----------------------------------------------------------------------------
-# Effect (ported from the CHECO26 slide2 pipeline, 00_map_helpers.R):
+# Effect (distilled from a production research-visualization pipeline):
 #   - China boundary (china.shp) + South China Sea nine-dash line (dashline.shp)
 #   - South China Sea inset in the bottom-right corner
 #   - Nature-style, colour-blind-friendly palettes (continuous + discrete)
@@ -33,22 +33,23 @@ parse_args <- function(args) {
   opt <- list(
     input = NULL, output = NULL, title = "", legend = "", palette = "viridis",
     mode = "continuous", classes = "clcd", band = NA_integer_,
-    limits = NULL, clamp = FALSE, src_nodata = NA_real_, assets = NULL,
+    limits = NULL, clamp = FALSE, reverse = FALSE, midpoint = NA_real_,
+    list_palettes = FALSE, src_nodata = NA_real_, assets = NULL,
     width = 7, height = 6.2, dpi = 600
   )
-  bool_flags <- c("clamp")
+  bool_flags <- c("clamp", "reverse", "list_palettes")
   i <- 1L
   while (i <= length(args)) {
     a <- args[[i]]
     if (!startsWith(a, "--")) { i <- i + 1L; next }
-    key <- sub("^--", "", a)
+    key <- gsub("-", "_", sub("^--", "", a))
     if (key %in% bool_flags) { opt[[key]] <- TRUE; i <- i + 1L; next }
     if (key == "limits") {
       opt$limits <- as.numeric(c(args[[i + 1L]], args[[i + 2L]])); i <- i + 3L; next
     }
     val <- args[[i + 1L]]
     if (key %in% c("band")) val <- as.integer(val)
-    if (key %in% c("src_nodata", "width", "height", "dpi")) val <- as.numeric(val)
+    if (key %in% c("src_nodata", "midpoint", "width", "height", "dpi")) val <- as.numeric(val)
     opt[[key]] <- val
     i <- i + 2L
   }
@@ -81,8 +82,58 @@ PAL <- list(
   ph = pal_seq("RdYlBu"), fertility = pal_seq("Greens", rev = TRUE),
   neutral = pal_seq("Viridis"), slope = pal_seq("YlOrRd"),
   hillshade = grDevices::grey.colors(256, start = 0.05, end = 0.95),
-  accum = pal_seq("YlGnBu"), viridis = pal_seq("Viridis")
+  accum = pal_seq("YlGnBu")
 )
+
+# Perceptually uniform, colour-blind-safe maps shared with the Python engine.
+# Values are grDevices::hcl.colors palette names (rendered natively here).
+PERCEPTUAL <- c(viridis = "Viridis", cividis = "Cividis",
+                inferno = "Inferno", plasma = "Plasma")
+
+# Nature-grade themes defined by EXPLICIT hex control points. These stops are
+# byte-for-byte identical to THEMES in render_china_map.py so both engines
+# interpolate the exact same colours. Sequential ramps run light -> dark; the
+# names in DIVERGING run low -> neutral -> high and pair with --midpoint.
+THEMES <- list(
+  blues   = c("#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08306B"),
+  greens  = c("#F7FCF5", "#E5F5E0", "#C7E9C0", "#A1D99B", "#74C476", "#41AB5D", "#238B45", "#006D2C", "#00441B"),
+  purples = c("#FCFBFD", "#EFEDF5", "#DADAEB", "#BCBDDC", "#9E9AC8", "#807DBA", "#6A51A3", "#54278F", "#3F007D"),
+  oranges = c("#FFF5EB", "#FEE6CE", "#FDD0A2", "#FDAE6B", "#FD8D3C", "#F16913", "#D94801", "#A63603", "#7F2704"),
+  reds    = c("#FFF5F0", "#FEE0D2", "#FCBBA1", "#FC9272", "#FB6A4A", "#EF3B2C", "#CB181D", "#A50F15", "#67000D"),
+  teal    = c("#F7FCFD", "#E5F5F9", "#CCECE6", "#99D8C9", "#66C2A4", "#41AE76", "#238B45", "#006D2C", "#00441B"),
+  ylgnbu  = c("#FFFFD9", "#EDF8B1", "#C7E9B4", "#7FCDBB", "#41B6C4", "#1D91C0", "#225EA8", "#253494", "#081D58"),
+  ylorrd  = c("#FFFFCC", "#FFEDA0", "#FED976", "#FEB24C", "#FD8D3C", "#FC4E2A", "#E31A1C", "#BD0026", "#800026"),
+  mako    = c("#D5F0EA", "#9FDCCB", "#5FB3A3", "#2E8289", "#1E4F6B", "#16263F"),
+  rocket  = c("#FBE6C8", "#F6A97A", "#E85D5D", "#B5305F", "#6E1A55", "#2C0B2E"),
+  rdbu     = c("#053061", "#2166AC", "#4393C3", "#92C5DE", "#D1E5F0", "#F7F7F7", "#FDDBC7", "#F4A582", "#D6604D", "#B2182B", "#67001F"),
+  rdylbu   = c("#313695", "#4575B4", "#74ADD1", "#ABD9E9", "#E0F3F8", "#FFFFBF", "#FEE090", "#FDAE61", "#F46D43", "#D73027", "#A50026"),
+  spectral = c("#3288BD", "#66C2A5", "#ABDDA4", "#E6F598", "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142"),
+  brbg     = c("#543005", "#8C510A", "#BF812D", "#DFC27D", "#F6E8C3", "#F5F5F5", "#C7EAE5", "#80CDC1", "#35978F", "#01665E", "#003C30"),
+  puor     = c("#7F3B08", "#B35806", "#E08214", "#FDB863", "#FEE0B6", "#F7F7F7", "#D8DAEB", "#B2ABD2", "#8073AC", "#542788", "#2D004B"),
+  prgn     = c("#40004B", "#762A83", "#9970AB", "#C2A5CF", "#E7D4E8", "#F7F7F7", "#D9F0D3", "#A6DBA0", "#5AAE61", "#1B7837", "#00441B")
+)
+DIVERGING <- c("rdbu", "rdylbu", "spectral", "brbg", "puor", "prgn")
+
+# Resolve a palette name -> colour vector. Order: THEMES -> PERCEPTUAL ->
+# semantic PAL. Unknown names abort with a helpful message (no silent misuse).
+resolve_palette <- function(name, reverse = FALSE) {
+  cols <- if (!is.null(THEMES[[name]])) THEMES[[name]]
+    else if (name %in% names(PERCEPTUAL)) pal_seq(PERCEPTUAL[[name]])
+    else if (!is.null(PAL[[name]])) PAL[[name]]
+    else stop("Unknown palette '", name, "'. Run --list-palettes to see options.")
+  if (isTRUE(reverse)) rev(cols) else cols
+}
+
+print_palettes <- function() {
+  seq_k <- setdiff(names(THEMES), DIVERGING)
+  cat("Nature-grade themes (byte-for-byte identical in Python and R):\n")
+  cat("  sequential :", paste(seq_k, collapse = ", "), "\n")
+  cat("  diverging  :", paste(DIVERGING, collapse = ", "), "  (pair with --midpoint)\n")
+  cat("  perceptual :", paste(names(PERCEPTUAL), collapse = ", "), "\n")
+  cat("Semantic keys (auto-picked by variable type):\n")
+  cat(" ", paste(sort(names(PAL)), collapse = ", "), "\n")
+  cat("Add --reverse to flip any palette.\n")
+}
 
 CLASS_DEFS <- list(
   clcd = list(
@@ -152,7 +203,7 @@ prepare_raster <- function(input, china_vect, band, mode, src_nodata, cache) {
 # build_map: main map + South China Sea inset (single ggplot)
 # ----------------------------------------------------------------------------
 build_map <- function(df, china_sf, dashline_sf, title, legend_title,
-                      discrete, palette, limits, class_def) {
+                      discrete, palette, limits, class_def, midpoint = NA_real_) {
   bounds <- as.numeric(sf::st_bbox(china_sf))
   if (discrete) {
     keep <- class_def$codes %in% as.integer(as.character(unique(df$value)))
@@ -163,9 +214,13 @@ build_map <- function(df, china_sf, dashline_sf, title, legend_title,
       values = stats::setNames(cols, labs), name = legend_title,
       na.value = "transparent", drop = TRUE)
   } else {
+    rescaler <- if (!is.na(midpoint)) {
+      function(x, to = c(0, 1), from = range(x, na.rm = TRUE))
+        scales::rescale_mid(x, to, from, mid = midpoint)
+    } else scales::rescale
     fill_scale <- ggplot2::scale_fill_gradientn(
       colours = palette, name = legend_title, limits = limits,
-      oob = scales::oob_squish, na.value = "transparent")
+      rescaler = rescaler, oob = scales::oob_squish, na.value = "transparent")
   }
 
   main_theme <- ggplot2::theme_void(base_size = 11, base_family = FONT_FAMILY) +
@@ -230,8 +285,9 @@ build_map <- function(df, china_sf, dashline_sf, title, legend_title,
 # ----------------------------------------------------------------------------
 main <- function() {
   opt <- parse_args(commandArgs(trailingOnly = TRUE))
+  if (isTRUE(opt$list_palettes)) { print_palettes(); return(invisible()) }
   if (is.null(opt$input) || is.null(opt$output))
-    stop("--input and --output are required")
+    stop("--input and --output are required (or use --list-palettes)")
   if (!file.exists(opt$input)) stop("Input raster not found: ", opt$input)
 
   script_dir <- tryCatch({
@@ -263,11 +319,11 @@ main <- function() {
     lim <- as.numeric(stats::quantile(df$value, c(0.02, 0.98), na.rm = TRUE))
     if (!all(is.finite(lim)) || diff(lim) == 0) lim <- range(df$value, na.rm = TRUE)
   }
-  palette <- PAL[[opt$palette]] %||% opt$palette
+  palette <- resolve_palette(opt$palette, reverse = isTRUE(opt$reverse))
   class_def <- if (discrete) CLASS_DEFS[[opt$classes]] else NULL
 
   p <- build_map(df, china_sf, dashline_sf, opt$title, opt$legend,
-                 discrete, palette, lim, class_def)
+                 discrete, palette, lim, class_def, opt$midpoint)
 
   outdir <- dirname(normalizePath(opt$output, mustWork = FALSE))
   dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
