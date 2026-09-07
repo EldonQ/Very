@@ -25,7 +25,14 @@ Small adjustments are allowed for optical alignment, but repeated slides must us
 
 ## 2. Typeface and hierarchy
 
-Default font: Calibri. If the user supplies a different Office-safe sans-serif, use it consistently and preserve the same hierarchy.
+The typeface assignment is mandatory:
+
+- Chinese characters and Chinese full-width punctuation: `宋体`.
+- Western characters, Latin-script words, Arabic numerals, units, and Western punctuation: `Times New Roman`.
+- For mixed-language text, set the East Asian font to `宋体` and the Latin font to `Times New Roman`. If the presentation library cannot assign both font slots reliably, split the text into script-specific runs and set each run explicitly.
+- Apply the rule to all editable text, including titles, body text, metrics, tables, chart labels, legends, annotations, and speaker notes where formatting is supported.
+- Do not substitute Calibri, Arial, Aptos, or another fallback font. Verify the final PPTX on a system where both required fonts are installed.
+- Text embedded in raster figures is not editable. Regenerate the figure with the required fonts when full-deck font compliance is requested; otherwise report the exception explicitly.
 
 | Role | Size | Weight | Color | Guidance |
 |---|---:|---|---|---|
@@ -147,6 +154,7 @@ Render every slide before delivery and inspect at normal size.
 - No unintended image distortion or cropping.
 - Standard titles share the same x, y, width, height, font size, and color.
 - Repeated column headings and content blocks align exactly.
+- Chinese text uses `宋体`; Western text uses `Times New Roman`. Mixed-language runs retain both assignments after saving and reopening the PPTX.
 - Body text is at least 18 pt and figure labels remain readable.
 - Long titles are shortened before they wrap; if a wrap is essential, enlarge the title box without colliding with content.
 - Text does not sit on top of visually busy evidence.

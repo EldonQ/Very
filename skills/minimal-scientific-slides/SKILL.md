@@ -20,7 +20,7 @@ Apply a restrained visual system in which evidence and spoken explanation carry 
 ## Non-negotiable visual rules
 
 - Use a 16:9 white canvas.
-- Use one sans-serif family throughout; default to Calibri for editable Office compatibility.
+- Use `宋体` for every Chinese character and `Times New Roman` for every Western character. This bilingual font rule is mandatory across titles, body text, metrics, labels, tables, charts, and speaker notes where font formatting is available.
 - Use the restrained palette, typography scale, grid, and spacing in `references/style-spec.md`.
 - Keep titles plain and left aligned. Do not add title bars, underlines, badges, or decorative rules.
 - Let one figure, chart, or result dominate when visual evidence exists.
@@ -30,6 +30,7 @@ Apply a restrained visual system in which evidence and spoken explanation carry 
 - Never stretch or distort images. Use contain-style placement by default; crop only when the crop is intentional and preserves the evidence.
 - Do not reduce body text below 18 pt. Shorten or split the content instead.
 - Treat any text overlap, awkward wrap, clipped glyph, or inconsistent alignment as a defect.
+- Split mixed-language text into runs when necessary so Chinese and Western scripts keep their required fonts. Recheck wrapping after font assignment because the metrics differ.
 
 ## Content independence
 
