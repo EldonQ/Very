@@ -1,0 +1,8 @@
+interface:
+  display_name: "Minimal Scientific Slides"
+  short_description: "Clean, figure-led academic PowerPoint styling"
+  brand_color: "#173B5F"
+  default_prompt: "Use $minimal-scientific-slides to create or restyle a clean, figure-led academic presentation."
+
+policy:
+  allow_implicit_invocation: true
