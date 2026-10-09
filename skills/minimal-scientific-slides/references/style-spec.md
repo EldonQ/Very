@@ -126,7 +126,7 @@ Because SimHei has no light weight, do not simulate emphasis with gray. Shorten 
 
 ## 6. Figure plate convention: panel letters and source lines
 
-A figure plate is the unit of evidence on a slide. It has three parts: the figure, its panel letters, and its source line.
+A figure plate is the unit of evidence on a slide. It has four parts: the figure, its panel letters (multi-panel only), a caption/legend line, and a source line.
 
 ### Panel letters
 
@@ -142,18 +142,24 @@ A figure plate is the unit of evidence on a slide. It has three parts: the figur
 
 ### Source line
 
-Every figure carries exactly one source line at the bottom of the plate, in 12–14 pt black. Match the phrasing to provenance:
+Every figure carries exactly one source line below the plate, in 12–14 pt black.
 
-| Provenance | Source-line form | Example form |
+**The source line states data and citation only.** It must never name the authors of the slide, nor narrate the act of reproducing a figure. Banned: `作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `摘自`, `本文绘制`, `Our figure`, `Adapted from`, `Courtesy of`, `Source: author`. In an academic talk these read as self-announcement or as production commentary, and they crowd out the evidence.
+
+| Content | Source-line form | Example |
 |---|---|---|
-| Self-produced figure | `作者自绘，基于 <数据来源>` | `作者自绘，基于 IUCN 红色名录范围图` |
-| Self-produced figure with statistics | `作者自绘，基于 <数据来源>；<检验/统计说明>` | `作者自绘，基于 GBIF 发生记录；Spearman 秩相关` |
-| Reproduced literature figure | `引自 <作者> (<年>), <期刊缩写> <卷>: <页>；Fig. <n>（<许可>）` | `引自 Barbarossa et al. (2021), Nat Commun 12: 1701；Fig. 1（CC BY 4.0）` |
-| Third-party data rendered by author | `数据：<来源与版本>；作者制图` | `数据：GBIF（2026-09 导出）；作者制图` |
+| Original analysis on a public dataset | `数据：<来源>（<版本/年份>）` | `数据：IUCN Red List（2025）` |
+| Original analysis combining datasets | `数据：<来源 A>；<来源 B>` | `数据：IUCN Red List（2025）、GBIF 发生记录` |
+| Reproduced literature figure | `<作者> et al. (<年>), <期刊缩写> <卷>: <页>, Fig. <n>（<许可>）` | `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1（CC BY 4.0）` |
+| Author's own model output | `数据：<记录来源>；<情景来源>；模型：<算法>` | `数据：GBIF（DOI 10.15468/dl.kmmt73）；模型：RF 与 MaxEnt 集成` |
 
-- Reproduced figures must record the licence (for example `CC BY 4.0`) and the exact figure number.
-- Put journal name, year, volume, and pages in the standard abbreviated form: `Nature 638: 138–145`.
+- Reproduced figures record the licence and the exact figure number.
+- Journal, year, volume, and pages use the standard abbreviated form: `Nature 638: 138–145`.
 - Keep the source line in the same position and size on every plate; left-align it under the figure.
+
+### Caption and legend line
+
+A separate line above the source line explains what is plotted, not where it came from: units, category coding, colour meaning, sample size. Example: `受威胁（CR/EN/VU）物种丰富度，0.05° 网格统计（种/格网）`. Keep caption and source as two separate short lines; never concatenate them into one long string.
 
 ### In-text citation
 
@@ -209,7 +215,8 @@ Render every slide before delivery and inspect at normal size.
 - Every text run is black `#000000`.
 - No background object, card, border, rule, badge, page number, or brand strip appears anywhere.
 - Body text is at least 18 pt and figure labels remain readable.
-- Every figure plate has panel letters where applicable and exactly one correctly formatted source line.
+- Every figure plate has panel letters where applicable (single-panel figures carry none), a separate caption/legend line, and exactly one correctly formatted source line.
+- No source line contains authorship or reproduction verbs (`作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `Adapted from`, `Courtesy of`, or similar).
 - Long titles are shortened before they wrap; if a wrap is essential, enlarge the title box without colliding with content.
 - Text does not sit on top of visually busy evidence; a plain text-backing rectangle is used only where needed for legibility.
 - Whitespace is balanced; no corner is crowded merely to fill the canvas.

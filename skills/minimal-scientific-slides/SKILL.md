@@ -11,7 +11,7 @@ Apply a strict academic visual system in which evidence and spoken explanation c
 
 1. Identify the slide's single communication job before laying it out.
 2. Select one layout family from `references/style-spec.md`.
-3. Inventory every figure and classify it as **self-produced**, **literature-derived**, or **data-derived from a cited source**. Each class has a mandatory citation form defined in `references/style-spec.md` §6.
+3. Inventory every figure and give it two annotation lines: a caption/legend line stating what is plotted (units, category coding, sample size) and a source line stating the data or the literature citation. Source-line forms are defined in `references/style-spec.md` §6. Neither line may name the slide's authors or narrate reproduction.
 4. Verify real bibliographic metadata before citing. Search the literature; never invent volume, issue, page, DOI, or licence strings.
 5. Fit the content by editing and prioritizing it, not by shrinking it below the specified minimums.
 6. Place figures with preserved aspect ratios and no decorative frames.
@@ -58,8 +58,9 @@ Apply a strict academic visual system in which evidence and spoken explanation c
 ## Reference and citation discipline
 
 - Every figure plate carries a visible source line. A figure without a traceable source is a defect, not a style choice.
-- Label multi-panel figures with bold panel letters `(a)`, `(b)`, `(c)` at a fixed offset inside each panel's upper-left corner.
-- Distinguish provenance explicitly in the source line: self-drawn work, literature reproduction, and third-party data reuse each use a different, standard phrasing defined in `references/style-spec.md` §6.
+- **Source lines state data and citation only — never authorship or reproduction verbs.** Banned on slides: `作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `摘自`, `本文绘制`, `Our figure`, `Adapted from`, `Courtesy of`. These are production commentary and they read as self-announcement in an academic talk. Write `数据：IUCN Red List（2025）` or `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1（CC BY 4.0）` instead.
+- Label multi-panel figures with bold panel letters `(a)`, `(b)`, `(c)` at a fixed offset inside each panel's upper-left corner. Skip panel letters on single-panel figures.
+- Separate the two jobs of figure annotation: a **legend/caption line** explains what is plotted (units, category coding, colour meaning), and a separate **source line** below it states the data or the literature citation. Do not merge them into one long string.
 - Record the licence for reproduced literature figures.
 - When the deck cites literature in text, use author–year form in parentheses and spell out the same reference in the closing reference slide.
 - Resolve every citation against a real source before delivery. If a bibliographic detail cannot be verified, mark it explicitly rather than guessing.
@@ -83,7 +84,7 @@ Deliver only after the rendered deck is visually stable:
 - repeated elements align to the same anchors;
 - text remains legible from a meeting-room screen;
 - figures are large enough to read without zooming;
-- every figure plate has panel letters where applicable and a correct source line;
+- every figure plate has panel letters where applicable, a caption line, and a source line free of authorship verbs;
 - captions and notes explain rather than duplicate the slide;
 - all text is black and renders in 黑体/Arial;
 - no slide looks like a dashboard or a collection of unrelated cards;
