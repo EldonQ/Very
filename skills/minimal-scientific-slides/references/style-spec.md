@@ -10,10 +10,26 @@ The visual benchmark is a printed journal figure plate: white ground, black ink,
 - Background: solid white `#FFFFFF`, with no fill object, gradient, texture, or watermark anywhere on the slide.
 - Standard left margin: 0.75 in.
 - Standard right margin: 0.75 in.
-- Standard title box: x 0.75, y 0.44, w 11.83, h 0.79.
-- Main content begins around y 1.35–1.65.
-- Keep a clear bottom margin of at least 0.45 in.
-- Align elements to a small number of repeated anchors. Do not make each slide's geometry unique.
+- Content width: 11.83 in.
+
+### Shared baseline anchors
+
+Define these once and derive every position from them. Hand-tuned per-slide y values are the main cause of pages that jump when flipped.
+
+| Anchor | y (in) | Content |
+|---|---|---|
+| `Y_SECTION` | 0.34 | section label, e.g. `② 中国本底` |
+| `Y_TITLE` | 0.70 | slide title, single line |
+| `Y_FIG` | 1.50 | figure block top |
+| `Y_NOTE` | 5.62 | caption + source line |
+| `Y_CONCL` | 6.06 | conclusion sentence |
+
+Two hard floors, enforced in the placement function:
+
+- `NOTE_CUT = 5.48` — the largest height any figure with a caption may occupy from `Y_FIG`. Clamp before the contain fit; a box alone does not keep the figure inside.
+- `CONCL_CUT = 6.86` — the lowest a conclusion line may reach.
+
+Keep a clear bottom margin of at least 0.45 in. Align elements to a small number of repeated anchors; do not make each slide's geometry unique.
 
 ### Two-column grid
 
@@ -22,6 +38,8 @@ The visual benchmark is a printed journal figure plate: white ground, black ink,
 - Gutter: about 0.83 in.
 - Column heading: y 1.62, h 0.50.
 - Main column content: y 2.29.
+
+When a figure sits beside a metrics column, set the metrics column x so the gutter matches the figure's actual right edge plus the standard gutter. A metrics column placed at a fixed x leaves a 1.2 in hole beside a narrow figure, which reads as a layout error.
 
 Small adjustments are allowed for optical alignment, but repeated slides must use the same anchors.
 
@@ -155,11 +173,18 @@ Every figure carries exactly one source line below the plate, in 12–14 pt blac
 
 - Reproduced figures record the licence and the exact figure number.
 - Journal, year, volume, and pages use the standard abbreviated form: `Nature 638: 138–145`.
-- Keep the source line in the same position and size on every plate; left-align it under the figure.
+- Keep the source line in the same position and size on every plate.
 
-### Caption and legend line
+### Caption and source share one line
 
-A separate line above the source line explains what is plotted, not where it came from: units, category coding, colour meaning, sample size. Example: `受威胁（CR/EN/VU）物种丰富度，0.05° 网格统计（种/格网）`. Keep caption and source as two separate short lines; never concatenate them into one long string.
+The caption and the source sit on **one horizontal line at `Y_NOTE`**, as two separate text boxes on the same baseline:
+
+- caption flush to the left margin `x = 0.75`, width ≈ 6.7 in, left-aligned;
+- source flush to the right margin, right-aligned, in the remaining width.
+
+Stacking them as two paragraphs is a defect, not a variant: it doubles the vertical footprint, reads as an accidental wrap, and pushes the conclusion line down on that slide only. Because the source is right-flushed its right edge forms a straight vertical rule down the deck — that alignment is the point, so keep source strings short enough to hold one line. Move a licence string or a long method qualifier into the caption or the speaker notes rather than letting the source wrap.
+
+A caption explains what is plotted, not where it came from: units, category coding, colour meaning, sample size. Example: `受威胁（CR/EN/VU）物种丰富度，0.05° 网格统计（种/格网）`. Never concatenate the caption and the source into one long string.
 
 ### In-text citation
 
@@ -169,6 +194,10 @@ A separate line above the source line explains what is plotted, not where it cam
 ## 7. Text and editorial presentation
 
 - Give each slide one clear point.
+- **One conclusion sentence per slide**, placed at `Y_CONCL` as a declarative finding. Do not add a closing line that restates numbers already printed beside the figure; a slide whose conclusion repeats the adjacent metrics has two competing texts.
+- A conclusion must not wrap so that a closing bracket, a period, or a single trailing character falls onto a second line. Shorten the sentence until it fits one line at 20 pt across 11.83 in, or accept two balanced lines.
+- **Metric labels are self-contained noun phrases.** Printed under a large number, the label must stand alone and must never open with a particle. Write `全球已评估淡水鱼类的受威胁比例`, never `26%` over `的已知淡水鱼类物种在全球受威胁`. The same ban covers labels opening with `是`, `占`, `为`, or a bare `的`.
+- Put method detail, parameter values, and provenance chains in the speaker notes unless the slide's single job is to state the method.
 - Prefer short declarative titles and compact noun phrases.
 - Keep body groups to approximately three to five lines where possible.
 - Avoid slogans, production commentary, template language, and labels that do not help the audience interpret the slide.
@@ -200,12 +229,22 @@ Keep `[Sources]` even when there are no formal citations if provenance or figure
 - Use a plain closing slide titled with the section label plus `参考文献` / `References`.
 - List one work per line as: `<作者> (<年>). <标题>. <期刊缩写> <卷>: <页>.`
 - Left-align with a hanging indent so author names align.
+- Build the list as **one text frame with one paragraph per entry and a uniform `space_after`**. Advancing y by a fixed step per entry leaves a visible hole wherever an entry runs one line instead of two.
 - Keep every entry in 14–16 pt black, no numbering decoration, no dividers, and no background.
 - Include every work cited on any slide or figure plate, so the deck is self-contained.
 
 ## 10. Visual QA checklist
 
-Render every slide before delivery and inspect at normal size.
+**Export every slide to PNG and read the images page by page at full size.** A programmatic compliance scan proves nothing forbidden is present; it cannot see a figure crossing the caption line, a one-character orphan wrap, or a label opening with a dangling particle. Reading the renders is what catches those.
+
+Automated assertions worth running in the same pass:
+
+- every run: `latin == Arial`, `ea == 黑体`, `srgbClr == 000000`;
+- no source line matches a banned authorship verb;
+- **every picture: `top + height <= NOTE_CUT`** — this one assertion catches the most common and most visible defect;
+- caption line and conclusion line at the same y on every slide.
+
+Then confirm by eye:
 
 - No text overlaps, clipped text, cropped glyphs, or off-slide objects.
 - No unintended image distortion or cropping.
@@ -215,8 +254,13 @@ Render every slide before delivery and inspect at normal size.
 - Every text run is black `#000000`.
 - No background object, card, border, rule, badge, page number, or brand strip appears anywhere.
 - Body text is at least 18 pt and figure labels remain readable.
-- Every figure plate has panel letters where applicable (single-panel figures carry none), a separate caption/legend line, and exactly one correctly formatted source line.
+- Every figure plate has panel letters where applicable (single-panel figures carry none), and a caption and source **sharing one line** with the source right-flushed.
+- Panel letters sit at each panel's real left edge, not at the requested box edge.
 - No source line contains authorship or reproduction verbs (`作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `Adapted from`, `Courtesy of`, or similar).
+- Figures fill the space the grid allows. A plate floating in half of its box reads as a small figure.
+- Each slide carries at most one conclusion sentence, and no line ends on a lone trailing character.
+- No metric label opens with `的`, `是`, `占`, or `为`.
+- Metric columns beside a figure leave a gutter matching the standard gutter, not a 1.2 in hole.
 - Long titles are shortened before they wrap; if a wrap is essential, enlarge the title box without colliding with content.
 - Text does not sit on top of visually busy evidence; a plain text-backing rectangle is used only where needed for legibility.
 - Whitespace is balanced; no corner is crowded merely to fill the canvas.

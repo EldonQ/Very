@@ -35,9 +35,10 @@ parse_args <- function(args) {
     mode = "continuous", classes = "clcd", band = NA_integer_,
     limits = NULL, clamp = FALSE, reverse = FALSE, midpoint = NA_real_,
     list_palettes = FALSE, src_nodata = NA_real_, assets = NULL,
+    opaque = FALSE, cjk = FALSE, legend_file = NULL,
     width = 7, height = 6.2, dpi = 600
   )
-  bool_flags <- c("clamp", "reverse", "list_palettes")
+  bool_flags <- c("clamp", "reverse", "list_palettes", "opaque", "cjk")
   i <- 1L
   while (i <= length(args)) {
     a <- args[[i]]
@@ -65,6 +66,7 @@ INSET_XLIM <- c(105, 126)
 INSET_YLIM <- c(2, 26)
 BORDER_COL <- "#4E5963"
 FONT_FAMILY <- "sans"
+OPAQUE <- FALSE  # TRUE -> white background instead of transparent
 
 pal_seq <- function(name, n = 256, rev = FALSE) {
   cols <- grDevices::hcl.colors(n, name); if (rev) rev(cols) else cols
@@ -227,11 +229,14 @@ build_map <- function(df, china_sf, dashline_sf, title, legend_title,
     ggplot2::theme(
       plot.title = ggplot2::element_text(face = "bold", hjust = 0.5, size = 12,
                                          margin = ggplot2::margin(b = 3)),
-      plot.background   = ggplot2::element_rect(fill = "transparent", colour = NA),
-      panel.background  = ggplot2::element_rect(fill = "transparent", colour = NA),
-      legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      plot.background   = ggplot2::element_rect(fill = if (OPAQUE) "white" else "transparent", colour = NA),
+      panel.background  = ggplot2::element_rect(fill = if (OPAQUE) "white" else "transparent", colour = NA),
+      legend.background = ggplot2::element_rect(fill = if (OPAQUE) "white" else "transparent", colour = NA),
       legend.key        = ggplot2::element_rect(fill = "transparent", colour = NA),
       legend.position = "right",
+      legend.title = ggplot2::element_text(size = 12.5, colour = "#15212B", face = "bold",
+                                           margin = ggplot2::margin(b = 4)),
+      legend.text  = ggplot2::element_text(size = 11.5, colour = "#15212B"),
       legend.key.width = ggplot2::unit(0.42, "cm"),
       legend.key.height = ggplot2::unit(1.4, "cm"),
       plot.margin = ggplot2::margin(4, 4, 4, 4))
@@ -267,8 +272,8 @@ build_map <- function(df, china_sf, dashline_sf, title, legend_title,
     ggplot2::theme_void(base_family = FONT_FAMILY) +
     ggplot2::theme(
       legend.position = "none",
-      plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-      panel.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+      plot.background = ggplot2::element_rect(fill = if (OPAQUE) "white" else "transparent", colour = NA),
+      panel.background = ggplot2::element_rect(fill = if (OPAQUE) "white" else "transparent", colour = NA),
       panel.border = ggplot2::element_rect(fill = NA, colour = BORDER_COL, linewidth = 0.4),
       plot.margin = ggplot2::margin(0, 0, 0, 0))
 
@@ -285,6 +290,13 @@ build_map <- function(df, china_sf, dashline_sf, title, legend_title,
 # ----------------------------------------------------------------------------
 main <- function() {
   opt <- parse_args(commandArgs(trailingOnly = TRUE))
+  # --legend-file: read legend title from a UTF-8 text file (bypasses shell
+  # encoding mangling of non-ASCII argv on Windows).
+  if (!is.null(opt$legend_file)) {
+    if (!file.exists(opt$legend_file)) stop("--legend-file not found: ", opt$legend_file)
+    opt$legend <- paste(readLines(opt$legend_file, encoding = "UTF-8", warn = FALSE),
+                        collapse = "\n")
+  }
   if (isTRUE(opt$list_palettes)) { print_palettes(); return(invisible()) }
   if (is.null(opt$input) || is.null(opt$output))
     stop("--input and --output are required (or use --list-palettes)")
@@ -306,6 +318,16 @@ main <- function() {
   if (!is.na(terra::crs(china_vect)) &&
       (terra::crs(china_vect, describe = TRUE)$code %||% "") != "4326")
     china_vect <- terra::project(china_vect, "EPSG:4326")
+
+  # --cjk: register a CJK-capable font so Chinese titles/legends render correctly
+  if (isTRUE(opt$cjk)) {
+    suppressPackageStartupMessages({ library(showtext); library(sysfonts) })
+    sysfonts::font_add("simsun", regular = "C:/Windows/Fonts/simsun.ttc")
+    showtext::showtext_opts(dpi = opt$dpi)
+    showtext::showtext_auto()
+    FONT_FAMILY <<- "simsun"
+  }
+  OPAQUE <<- isTRUE(opt$opaque)
 
   cache <- file.path(tempdir(), "geoviz_cache")
   dir.create(cache, recursive = TRUE, showWarnings = FALSE)
@@ -330,9 +352,11 @@ main <- function() {
   png_path <- paste0(opt$output, ".png")
   pdf_path <- paste0(opt$output, ".pdf")
   ggplot2::ggsave(png_path, p, width = opt$width, height = opt$height,
-                  dpi = opt$dpi, bg = "transparent", limitsize = FALSE)
+                  dpi = opt$dpi, bg = if (OPAQUE) "white" else "transparent",
+                  limitsize = FALSE)
   ggplot2::ggsave(pdf_path, p, width = opt$width, height = opt$height,
-                  device = grDevices::cairo_pdf, bg = "transparent",
+                  device = grDevices::cairo_pdf,
+                  bg = if (OPAQUE) "white" else "transparent",
                   limitsize = FALSE)
   message("  wrote: ", basename(png_path), " / ", basename(pdf_path))
 }
