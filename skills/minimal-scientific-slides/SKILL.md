@@ -68,6 +68,14 @@ Apply a strict academic visual system in which evidence and spoken explanation c
 
 This skill defines presentation form only. It must not embed or distribute a source presentation, source images, screenshots, data, research claims, institution names, person names, project names, or topic-specific examples. When demonstrating a layout, use neutral placeholders such as `[Title]`, `[Figure]`, `[Panel a]`, `[Key result]`, `[Interpretation]`, and `[Source line]`.
 
+## Implementation notes (python-pptx path)
+
+- `run.font.name` writes **only** the `a:latin` slot. To satisfy the bilingual font rule, append `a:ea` and `a:cs` elements to the run's `a:rPr` right after `a:latin`. Appending preserves schema order (`solidFill` → `latin` → `ea` → `cs`), so PowerPoint opens the file without repair.
+- Verify compliance programmatically before delivery: walk every run, assert `latin == Arial`, `ea == 黑体`, and `srgbClr == 000000`. Report the violation count; do not eyeball it.
+- Rendered map/chart PNGs often carry large white margins. Contain-fit placement then makes the figure look small. Trim white borders (PIL `ImageChops.difference` + `getbbox`) before placing, and recompute every box from the trimmed aspect ratio — a near-square 1.13:1 map can become 2.3:1 after trimming, which changes the correct layout family.
+- Never add a slide-level panel letter if the figure already draws `(a)`/`(b)` inside itself. Duplicated letters render as overlapping text. Panel letters belong only on multi-panel plates.
+- For hanging-indent reference lists, set `marL` and a negative `indent` on the paragraph properties; there is no high-level API.
+
 ## Quality bar
 
 Deliver only after the rendered deck is visually stable:
