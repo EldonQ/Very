@@ -18,11 +18,13 @@ Define these once and derive every position from them. Hand-tuned per-slide y va
 
 | Anchor | y (in) | Content |
 |---|---|---|
-| `Y_SECTION` | 0.34 | section label, e.g. `② 中国本底` |
-| `Y_TITLE` | 0.70 | slide title, single line |
+| `Y_SECTION` | 0.34 | section label |
+| `Y_TITLE` | 0.70 | slide title, 1–2 lines |
 | `Y_FIG` | 1.50 | figure block top |
 | `Y_NOTE` | 5.62 | caption + source line |
-| `Y_CONCL` | 6.06 | conclusion sentence |
+| `Y_CONCL` | 6.06 | conclusion sentence — **optional**, see §7 |
+
+`Y_CONCL` is present only on slides using the topic-title structure. On an action-title page the figure simply runs from `Y_FIG` to `NOTE_CUT` and the page ends at the caption line; do not reserve empty space for a conclusion that was deleted.
 
 Two hard floors, enforced in the placement function:
 
@@ -194,9 +196,11 @@ A caption explains what is plotted, not where it came from: units, category codi
 ## 7. Text and editorial presentation
 
 - Give each slide one clear point.
-- **One conclusion sentence per slide**, placed at `Y_CONCL` as a declarative finding. Do not add a closing line that restates numbers already printed beside the figure; a slide whose conclusion repeats the adjacent metrics has two competing texts.
-- A conclusion must not wrap so that a closing bracket, a period, or a single trailing character falls onto a second line. Shorten the sentence until it fits one line at 20 pt across 11.83 in, or accept two balanced lines.
+- **The title states that point.** See `argument-and-titles.md` §1. A topic-label title is only acceptable where a figure needs a topic anchor — a two-panel plate, or a page in a results series — and such pages are a minority.
+- **Never carry both an action title and a conclusion sentence on the same page.** If the title is the finding, there is no conclusion line. If a conclusion line is needed, the title is short and topical.
+- Where a conclusion line is used, it must not wrap so that a closing bracket, a period, or a single trailing character falls onto a second line. Shorten the sentence until it fits one line at 20 pt across 11.83 in, or accept two balanced lines.
 - **Metric labels are self-contained noun phrases.** Printed under a large number, the label must stand alone and must never open with a particle. Write `全球已评估淡水鱼类的受威胁比例`, never `26%` over `的已知淡水鱼类物种在全球受威胁`. The same ban covers labels opening with `是`, `占`, `为`, or a bare `的`.
+- Body text stays at about 40 words maximum per slide.
 - Put method detail, parameter values, and provenance chains in the speaker notes unless the slide's single job is to state the method.
 - Prefer short declarative titles and compact noun phrases.
 - Keep body groups to approximately three to five lines where possible.
@@ -235,21 +239,30 @@ Keep `[Sources]` even when there are no formal citations if provenance or figure
 
 ## 10. Visual QA checklist
 
-**Export every slide to PNG and read the images page by page at full size.** A programmatic compliance scan proves nothing forbidden is present; it cannot see a figure crossing the caption line, a one-character orphan wrap, or a label opening with a dangling particle. Reading the renders is what catches those.
+Run the full procedure in `visual-review.md`: automated assertions, then four visual passes (overview, page by page, cross-slide comparison, distance test).
 
-Automated assertions worth running in the same pass:
+Automated assertions worth running:
 
 - every run: `latin == Arial`, `ea == 黑体`, `srgbClr == 000000`;
 - no source line matches a banned authorship verb;
 - **every picture: `top + height <= NOTE_CUT`** — this one assertion catches the most common and most visible defect;
-- caption line and conclusion line at the same y on every slide.
+- caption line at the same y on every slide;
+- point-size audit per role, compared across slides.
+
+Content layer (see `argument-and-titles.md`):
+
+- every content slide's title is a complete sentence stating the takeaway, not a topic label;
+- ghost deck test passes: the title sequence alone tells the complete argument;
+- no page carries both an action title and a conclusion sentence stating the same claim;
+- one exhibit per slide, directly supporting its title;
+- conclusions slide is last non-appendix slide; no "thank you" ending.
 
 Then confirm by eye:
 
 - No text overlaps, clipped text, cropped glyphs, or off-slide objects.
 - No unintended image distortion or cropping.
 - Standard titles share the same x, y, width, height, font size, and color.
-- Repeated column headings and content blocks align exactly.
+- Repeated column headings and content blocks align exactly — verified by **opening pairs of similar slides side by side**, not one at a time.
 - Chinese text renders in `黑体`; Western text renders in `Arial`. Mixed-language runs retain both assignments after saving and reopening the PPTX.
 - Every text run is black `#000000`.
 - No background object, card, border, rule, badge, page number, or brand strip appears anywhere.
@@ -258,7 +271,7 @@ Then confirm by eye:
 - Panel letters sit at each panel's real left edge, not at the requested box edge.
 - No source line contains authorship or reproduction verbs (`作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `Adapted from`, `Courtesy of`, or similar).
 - Figures fill the space the grid allows. A plate floating in half of its box reads as a small figure.
-- Each slide carries at most one conclusion sentence, and no line ends on a lone trailing character.
+- **Distance test**: viewed at 30–40 % size, the title is readable and the figure's key finding is visible without hunting. Axis labels that need to shrink to fit indicate a figure that needs redesigning.
 - No metric label opens with `的`, `是`, `占`, or `为`.
 - Metric columns beside a figure leave a gutter matching the standard gutter, not a 1.2 in hole.
 - Long titles are shortened before they wrap; if a wrap is essential, enlarge the title box without colliding with content.

@@ -1,26 +1,51 @@
 ---
 name: minimal-scientific-slides
-description: "Create or restyle editable 16:9 PowerPoint decks with a strict academic visual system: pure white canvas, black text only, SimHei for Chinese and Arial for Western scripts, generous whitespace, large evidence graphics, panel-labelled figures with formal source citations, concise text, and bilingual speaker notes. Use when the user asks for a minimal scientific or academic presentation, wants an existing deck normalized to this style, or needs layout and visual QA without decorative templates. The skill is content-agnostic and must never copy subject matter, branding, screenshots, or project-specific wording from a source deck."
+description: "Create or restyle editable 16:9 PowerPoint decks with a strict academic visual system: argument-first titles that pass the ghost deck test, pure white canvas, black text only, SimHei for Chinese and Arial for Western scripts, generous whitespace, large evidence graphics, panel-labelled figures with formal source citations, concise text, and bilingual speaker notes. Use when the user asks for a minimal scientific or academic presentation, wants an existing deck normalized to this style, or needs layout and visual QA without decorative templates. The skill is content-agnostic and must never copy subject matter, branding, screenshots, or project-specific wording from a source deck."
 ---
 
 # Minimal Scientific Slides
 
 Apply a strict academic visual system in which evidence and spoken explanation carry the presentation. The reference benchmark is a printed journal figure plate: white ground, black ink, generous figure area, panel letters, and a formal source line. Keep every slide editable unless the user explicitly requests flattened output.
 
+A journal figure plate and a lecture slide share a look but not a job. In a figure plate the title is a caption and carries no argument. In a slide the title **is** the argument. Confusing the two produces the most common defect in academic decks: topic-label headings plus a compensating conclusion line lower down, which states the same claim twice and reads as verbose. This skill therefore governs content and argument first, and layout second.
+
 ## Workflow
 
-1. Identify the slide's single communication job before laying it out.
-2. Select one layout family from `references/style-spec.md`.
-3. Inventory every figure and give it two annotation lines: a caption/legend line stating what is plotted (units, category coding, sample size) and a source line stating the data or the literature citation. Source-line forms are defined in `references/style-spec.md` §6. Neither line may name the slide's authors or narrate reproduction.
-4. Verify real bibliographic metadata before citing. Search the literature; never invent volume, issue, page, DOI, or licence strings.
-5. Fit the content by editing and prioritizing it, not by shrinking it below the specified minimums.
-6. Place figures with preserved aspect ratios and no decorative frames.
-7. Attach panel letters and the source line to every figure plate.
-8. Add speaker notes in the requested language format. Use the bilingual convention in the style specification when bilingual notes are requested or already present.
-9. Render the complete deck and inspect every slide at normal viewing size.
-10. Run available slide-overflow and element-overlap checks. Correct all unintended collisions, clipping, off-canvas elements, and unstable line wraps.
+**Order matters. Do not start from layout.**
+
+1. **Choose the argument spine** (situation/complication/resolution, funnel+answer, or answer-first) and state the central question by slide 3 at the latest. See `references/argument-and-titles.md` §2.
+2. **Write every slide title as a complete sentence stating the takeaway** — not a topic label. Draft all titles before building any slide. See `references/argument-and-titles.md` §1.
+3. **Run the ghost deck test.** Read only the titles in sequence. They must tell the complete argument. If they read as a table of contents, repair the argument — rewrite titles, reorder, or cut slides — before building anything. Fixing this later means rebuilding the deck.
+4. **Verify real bibliographic metadata before citing.** Search the literature; never invent volume, issue, page, DOI, or licence strings.
+5. **Select one layout family** per slide from `references/style-spec.md`, deriving every position from the shared baseline constants in §1.
+6. **Inventory every figure** and give it two annotation items: a caption stating what is plotted (units, category coding, sample size) and a source stating the data or literature citation. Source-line forms are in `references/style-spec.md` §6. Neither may name the slide's authors or narrate reproduction.
+7. **Place figures at preserved aspect ratio**, top-left anchored, with the height clamped so a figure can never cross the caption line. Give the figure the largest box the grid allows.
+8. **Attach panel letters** where the plate is multi-panel, at the panel's real left edge.
+9. **Add speaker notes** in the requested language format. Move method detail, parameter values and provenance chains here — they are not read from the back of a room.
+10. **Run the automated assertions**, then **export every page and read it** through the four visual passes in `references/visual-review.md`. Fix, re-export, re-read. A passing scan is not evidence that the deck looks right.
 
 ## Non-negotiable visual rules
+
+### Titles are the argument, not labels
+
+- **Every content slide's title is a complete sentence stating that slide's takeaway.** Never a topic label, never a bare section name. `受胁物种热点与多样性热点在空间上高度重叠` is a label; `中国淡水鱼适生区的受胁热点与多样性热点重合` is a finding.
+- Read the title sequence alone. It must tell the whole argument — the **ghost deck test**. Repair the argument before building, not after.
+- One or two lines. Three lines means the point is not sharp enough yet.
+- Titles must be mutually distinguishable. If two titles could be swapped between their slides unnoticed, fix the redundancy.
+- A question may open a deck; it cannot carry a results slide.
+
+### The title–conclusion redundancy rule
+
+When the title already states the finding, **delete the separate conclusion line.** A page carrying both an action title and a conclusion sentence says the same thing twice, which is what makes a deck read as verbose.
+
+The two structures are mutually exclusive:
+
+| Structure | Page contains |
+|---|---|
+| **Action title** (default) | conclusion-bearing title · figure · caption + source |
+| **Topic title** (only when a figure needs a topic anchor, e.g. a two-panel plate or a results series) | short topic title · figure · caption + source · one conclusion sentence |
+
+Never mix them on one page. If a slide genuinely needs a concluding sentence, its title must be a short topic label — but a topic label is a concession, not a default, and it must not be the majority of the deck.
 
 ### Typography
 
@@ -58,11 +83,12 @@ Apply a strict academic visual system in which evidence and spoken explanation c
 
 ## Copy discipline
 
-- **One conclusion per slide.** State the finding as a single declarative sentence; do not add a closing sentence that restates numbers already printed beside the figure.
-- A conclusion line must not break so that a closing bracket or a single trailing character falls onto a second line. Shorten the sentence until it fits.
+- **Body text: about 40 words maximum per slide.** Above that, split the slide or move the material to the notes.
+- **Method detail belongs in speaker notes.** Parameter values, provenance chains, sample-size derivations and algorithm lists are not read from the back of a room. Keep them in notes unless the slide's single job is to state the method.
+- A conclusion line, where the structure calls for one, must not break so that a closing bracket or a single trailing character falls onto a second line. Shorten the sentence until it fits.
 - **Metric labels are self-contained noun phrases.** When a large number is printed above a label, the label must read as a standalone phrase and must never begin with a particle such as `的`, `是`, or `占`. Write `全球已评估淡水鱼类的受威胁比例`, not `的已知淡水鱼类物种在全球受威胁`.
 - Delete any sentence that only re-encodes a number sitting two centimetres away on the same slide.
-- Move method detail, parameter values, and provenance chains into the speaker notes unless the slide's single job is to state the method.
+- Telegraphic phrasing is fine where meaning survives: `1,525 known freshwater species`, not `Our study found that there were 1,525 species`.
 
 ## Shared baseline grid
 
@@ -120,16 +146,28 @@ This skill defines presentation form only. It must not embed or distribute a sou
 
 Deliver only after the rendered deck is visually stable:
 
-- repeated elements align to the same anchors;
-- the caption line and the conclusion line sit at the same y on every slide, so flipping pages produces no vertical jump;
+- titles alone tell the argument (ghost deck test passes);
+- no page carries both an action title and a conclusion sentence stating the same claim;
+- repeated elements align to the same anchors, verified by cross-slide comparison;
+- the caption line sits at the same y on every slide, so flipping pages produces no vertical jump;
 - no figure crosses the note line — assert `picture top + height <= NOTE_CUT`;
-- text remains legible from a meeting-room screen;
+- every exhibit is legible at distance and its key finding is visible without hunting;
 - figures are large enough to read without zooming;
 - every figure plate has panel letters where applicable, and a caption and source sharing one line, with the source free of authorship verbs;
-- each slide carries at most one conclusion sentence, and no line ends on a lone trailing character;
 - captions and notes explain rather than duplicate the slide;
 - all text is black and renders in 黑体/Arial;
 - no slide looks like a dashboard or a collection of unrelated cards;
-- the visual hierarchy is obvious within two seconds.
+- the visual hierarchy is obvious within two seconds, including from the back of the room.
 
-The last round of review must be done by **looking at the exported slide images**, page by page, at full size. A clean compliance scan is evidence that nothing is forbidden; it is not evidence that the deck looks right. Reading the renders is what catches the defects a scanner cannot see.
+The final review must be done by **looking at the exported slide images**, through all four passes in `references/visual-review.md`: overview, page by page, cross-slide comparison, and distance test. A programmatic compliance scan proves nothing forbidden is present; it cannot see a figure crossing the caption line, an orphan wrap, a label opening with a dangling particle, or two pages that each pass alone but do not match as a pair.
+
+## Provenance of these rules
+
+The content-layer rules are drawn from sources that may be cited alongside them:
+
+- Naegle KM (2021). Ten simple rules for effective presentation slides. *PLoS Computational Biology* 17(12): e1009554. CC BY 4.0. — one idea per slide, one minute per slide, **title as takeaway**, cite what is borrowed, avoid cognitive overload, design for the distracted listener.
+- Gabberflast `academic-pptx-skill` (MIT) — action titles, ghost deck test, exhibit discipline, argument-first outline before building.
+- k-dense-ai `scientific-slides` — the four-pass visual review, issue checklist, distance test, cross-slide comparison, common-pitfalls taxonomy.
+- Nature Research Figure Guide — axis and tick requirements, colour-blind-safe palette, panel-letter form, text-size floors.
+
+The layout layer remains this skill's own design system: pure black text, 黑体/Arial, no decoration, shared baseline grid, one-line caption and source. Content rules were adopted from the sources above; the visual system was not copied from them.
