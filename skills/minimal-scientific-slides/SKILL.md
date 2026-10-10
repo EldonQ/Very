@@ -73,7 +73,9 @@ Never mix them on one page. If a slide genuinely needs a concluding sentence, it
 
 ### Figures and text
 
-- **Fill the canvas.** A page floating inside its own margins reads as cramped, not minimal. Measure every asset's aspect ratio first and pick the layout family from it: wide plates (ratio ≥ 2.2) take the **full content width** with height following the ratio; mid charts (1.5–2.0) take a figure plus a side column; square plates (≤ 1.3) are height-limited and the side column absorbs the slack. A uniform height cap applied to mixed ratios strands the narrow figures in white space.
+- **The figure is the protagonist; text is the caption.** Default a content page to the figure alone on the plate at full content width, with the reading carried by the caption band and the notes. Target **75% figure / 25% text** by width. A page split evenly is a page where neither element wins. Reach for a side column only when the numbers themselves are the point of the page (a composition breakdown, a pair of headline figures), and then cap the column at a quarter of the content width.
+- **Fill the canvas.** A page floating inside its own margins reads as cramped, not minimal. Measure every asset's aspect ratio first and pick the layout family from it: wide plates (ratio ≥ 2.2) take the **full content width** with height following the ratio; mid charts (1.5–2.0) go full width and centre when height-limited; square plates (≤ 1.3) are height-limited, so give them a column that carries real content rather than one lonely metric. A uniform height cap applied to mixed ratios strands the narrow figures in white space.
+- **Re-draw a figure whose aspect ratio wastes the plate.** When a chart must occupy an awkward fraction of a 16:9 page, transposing it usually beats shrinking it. A vertical bar chart of 7 categories becomes a horizontal bar chart at ratio ≈ 2.8 and fills the content width instead of 55% of it.
 - Let one figure, chart, or result dominate when visual evidence exists.
 - Prefer one strong number plus a short explanation over dense tables of metrics.
 - Use flat text and images only.
@@ -82,6 +84,25 @@ Never mix them on one page. If a slide genuinely needs a concluding sentence, it
 - On text-only pages, position by where each block actually **ends**, not by a fixed step. Short text at fixed y positions leaves the gaps between blocks and drags the bottom margin out.
 - Do not reduce body text below the specified minimum. Shorten or split the content instead.
 - Treat any text overlap, awkward wrap, clipped glyph, or inconsistent alignment as a defect.
+- **Size the title box for two lines even when most titles are one line.** A box sized for one line at 28 pt (0.82 in) cannot hold two lines at 1.18 spacing (0.92 in); the overflow runs upward and lands on the section label above it. Either give the box room for two lines or shorten every title past the one-line character budget. Verify by measuring each title length against the box width, not by looking at the rendered slide.
+
+## A story, not a sequence of results
+
+A deck of correct slides is not an argument. Before laying out anything, write the claim each page makes and check that the sequence creates a reason to continue.
+
+- **Promote the deck's most interesting number to the spine.** A statistic that looks like an embarrassment — a near-zero correlation, a wide error bar, an unexpectedly flat trend — is usually the most reportable thing in the data. Ask what would have to be true for that number to be real, test it, and let the answer carry the middle of the deck. Demoting it to one slide among many wastes the strongest material available.
+- **Order the pages as an argument, not as a workflow.** Global context → national baseline → methods → results is a table of contents. Contradiction → competing explanations → tests that discriminate between them → the constraint the verdict imposes → the method that satisfies the constraint → results is an argument.
+- **Test an objection before a reviewer does.** Where a number invites an obvious alternative explanation, put that explanation on a slide and refute it with a test whose result is reported whichever way it falls. Reporting a test that fails to discriminate, or a stratum whose estimate is undefined, is stronger than omitting the question.
+- **Make a diagnostic finding do methodological work.** The best ending for a diagnostic slide is the sentence "therefore the method must be X, because Y." A diagnostic that changes nothing downstream is trivia.
+- Then run the ghost-deck test (see `references/argument-and-titles.md`): reading only the titles in order must reconstruct a defensible argument.
+
+## Statistical claims on slides
+
+- **Never print a correlation coefficient without its uncertainty or its test.** `ρ = 0.08` alone is unreadable. What matters is whether the value is distinguishable from zero, which takes a permutation test or a confidence interval, and the deck should say which.
+- **When a distribution is zero-inflated, a single correlation understates the structure.** Split the question into "is this unit observed at all" and "how much is observed once it is", and report both slopes. A rank correlation computed over mostly-zero data is a statement about the zeros.
+- **Decompose by the quality axis a reviewer would name.** If names were matched against a taxonomic backbone, the correlation restricted to exact matches is the test — and a near-identical value is the finding.
+- **Report an unestimable stratum as unestimable.** When a stratum has no usable key, say so and explain why substituting an aggregate would be wrong. A fabricated estimate for a diagnostic slide is worse than a blank.
+- **Check that two sample sizes agree before printing either.** Filters that differ by one covariate produce two defensible, different `n` values. Label each with its own filter instead of letting them silently disagree across pages.
 
 ## Copy discipline
 
@@ -118,7 +139,9 @@ A picture inserted with vertical centring sits lower than its frame by roughly h
 ## Reference and citation discipline
 
 - Every figure plate carries a visible source line. A figure without a traceable source is a defect, not a style choice.
-- **Source lines state data and citation only — never authorship or reproduction verbs.** Banned on slides: `作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `摘自`, `本文绘制`, `Our figure`, `Adapted from`, `Courtesy of`. These are production commentary and they read as self-announcement in an academic talk. Write `数据：IUCN Red List（2025）` or `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1（CC BY 4.0）` instead.
+- **Source lines state data and citation only — never authorship or reproduction verbs, and never a label prefix.** Banned on slides: `作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `摘自`, `本文绘制`, `Our figure`, `Adapted from`, `Courtesy of`. These are production commentary and they read as self-announcement in an academic talk. Also banned: a category label in front of the source, such as `数据：`, `来源：`, `Source:`. The label adds nothing the citation does not already say, and it is a tic that reads as machine-generated.
+- **Write the bare citation.** `IUCN Red List (2025)` or `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1` — not `数据：IUCN Red List（2025）`. The line should read as it would in a journal figure legend.
+- Set the licence in the caption or the notes, not in the source line.
 - Label multi-panel figures with bold panel letters `(a)`, `(b)`, `(c)` at a fixed offset inside each panel's upper-left corner. Skip panel letters on single-panel figures.
 - Separate the two jobs of figure annotation: a **caption line** explains what is plotted (units, category coding, colour meaning), and a **source line** states the data or the literature citation. They are two distinct items; neither may name the authors nor narrate reproduction.
 - Put the caption and the source on **ONE horizontal line** — caption flush to the left margin, source flush to the right margin, both on the same baseline. Never stack them as two paragraphs; a stacked pair reads as an accidental wrap and doubles the vertical footprint.

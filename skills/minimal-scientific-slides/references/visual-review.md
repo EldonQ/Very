@@ -133,3 +133,20 @@ When generating the figures themselves, follow journal-grade conventions so they
 - multi-panel letters bold, upright, lowercase a/b/c, at the same size as the rest of the figure text
 
 Source: Nature Research Figure Guide, *Preparing figures* and *Building and exporting figure panels*.
+
+## Encoding honesty
+
+A chart that encodes something the reader cannot decode is worse than no chart: it looks informative and carries noise. Audit every visual channel before delivery.
+
+- **Test each encoding against its own range.** Point area spanning 2.5–6 units cannot convey a 33-fold difference in cell count. If the encoded quantity varies by more than about 4×, the reader cannot recover it from the mark and the channel should be dropped or replaced by an explicit annotation (`n = 22,082 to 72,296`).
+- **Distinguish "less data" from "less land".** Binning by degrees rather than by area makes high-latitude bands look data-poor purely because the country narrows there (cos 53° / cos 19° = 0.64). Any spatial aggregation must hold the sampled area comparable across bins, or state the imbalance.
+- **Do not let a secondary hue exist without a job.** One accent colour marks the one series the reader must act on. A second hue is a claim that the two things differ in kind.
+- **Use a summary band when the interesting signal is flat.** A permutation null that spans ±0.03 against an observation at 0.084 is best shown as a histogram with the null range shaded, not as a point estimate with an error bar.
+- **Put the sample size in the annotation, not in the reader's inference.** Every panel that aggregates should state its own `n` range inline.
+- **Keep annotation text inside the panel.** Compute the label's position against the axis limits after expansion, not before — an annotation at `y = Inf` or beyond the last break silently disappears or overlaps a neighbour. Reserve a band for annotations (`scale_y_continuous(limits = c(0, TOP_A))`) rather than hoping the expansion leaves room.
+
+## Legends
+
+- Name a legend series with the quality criterion it encodes, plus its `n`: `Stratum A (perfectly matched, n = 1,359)`.
+- When `scale_*_manual()` is given a named vector, the names must match the factor's levels **exactly**, including runs of spaces. A near miss returns no error — the series silently renders grey.
+- An annotation layer must not inherit a `fill` mapping it has no column for. Pass `inherit.aes = FALSE` and declare only what the layer needs; if a stray key still appears, remove it with `guide_legend(override.aes = list())` — but fix the root cause first, because `fill = NA` renders as a visible legend entry, not as nothing.

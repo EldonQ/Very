@@ -18,15 +18,17 @@ Define these once and derive every position from them. Hand-tuned per-slide y va
 
 | Anchor | y (in) | Content |
 |---|---|---|
-| `Y_SECTION` | 0.28 | section label |
-| `Y_TITLE_TOP` | 0.56 | title box top |
-| `Y_TITLE_BOT` | 1.38 | title box bottom — titles are **bottom-aligned** |
+| `Y_SECTION` | 0.24 | section label |
+| `Y_TITLE_TOP` | 0.50 | title box top |
+| `Y_TITLE_BOT` | 1.44 | title box bottom — titles are **bottom-aligned** |
 | `Y_FIG` | 1.86 | figure block top |
 | `Y_NOTE` | 6.74 | caption + source line |
 
 `NOTE_CUT = 6.58` — the hard floor. No figure may extend past it. Clamp before the contain fit; a box alone does not keep the figure inside.
 
 **Titles are bottom-aligned to `Y_TITLE_BOT`, not top-aligned.** A top-aligned title leaves a one-line title's figure starting in a different place than a two-line title's. Bottom alignment puts every figure top on the same line regardless of title length.
+
+**The title box must fit two lines even when most titles are one.** At 28 pt with 1.18 line spacing, one line needs 0.46 in and two need 0.92 in. A 0.82 in box silently overflows upward, and since the box is bottom-anchored the overflow lands on the section label above it — the collision is invisible in the build output and only shows in the render. Two ways out: size the box at 0.94 in, or hold every title under the one-line budget (about 30 CJK characters across 11.89 in at 28 pt). Measure the title length against the box width in the checker rather than eyeballing the render.
 
 `Y_CONCL` is gone. On an action-title page there is no conclusion line; the figure runs from `Y_FIG` to `NOTE_CUT` and the page ends at the caption line. Do not reserve space for a conclusion that was deleted.
 
@@ -43,10 +45,16 @@ Measured ratios from a real deck:
 | Ratio | Asset kind | Layout family |
 |---|---|---|
 | ≥ 2.2 | wide map, wide chart | **full content width**, height follows the ratio |
-| 1.5 – 2.0 | mid chart | figure at ~7.4 in + side column |
-| ≤ 1.3 | square plate | figure height-limited; side column absorbs the slack |
+| 1.5 – 2.0 | mid chart | **full content width, centred**; height-limited, so it sits mid-plate |
+| ≤ 1.3 | square plate | figure height-limited; give it a column carrying real content |
 
 The trap: a 2.31-ratio map capped at 3.42 in of height becomes width-limited to 9.4 in and floats in an 11.89 in frame — 1.2 in of dead space per side plus 2.6 in underneath. Giving it the full content width instead raises it to 11.89 in wide and 5.15 in tall, which fills the page.
+
+**Default the page to figure alone at 75% of the content width**, with the reading in the caption band and the notes. A mid-ratio plate goes full width and centres; it is height-limited, so centring is the correct behaviour, not a compromise.
+
+**Before accepting a plate that uses only half the width, try transposing it.** A vertical bar chart over 7 ordered categories becomes a horizontal bar chart at ratio ≈ 2.8 and then fills the content width instead of 55% of it. Transposition is the fix when a figure is *your own*; a reproduced figure keeps whatever ratio the authors chose.
+
+**A square plate next to a column is only half a solution** if the column holds one lonely metric — the page then reads as two half-measures. Give the column two or three figures, or move the numbers into the notes and let the plate stand alone at full width.
 
 ### Filling vertical space on text-only pages
 
@@ -190,14 +198,16 @@ Every figure carries exactly one source line below the plate, in 12–14 pt blac
 
 **The source line states data and citation only.** It must never name the authors of the slide, nor narrate the act of reproducing a figure. Banned: `作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `摘自`, `本文绘制`, `Our figure`, `Adapted from`, `Courtesy of`, `Source: author`. In an academic talk these read as self-announcement or as production commentary, and they crowd out the evidence.
 
+**No category label in front of the citation.** A leading `数据：`, `来源：`, or `Source:` is banned on slides. The label restates what the citation already implies, and it is a tic readers recognise as machine-generated. Write the citation bare, the way it would appear in a journal figure legend.
+
 | Content | Source-line form | Example |
 |---|---|---|
-| Original analysis on a public dataset | `数据：<来源>（<版本/年份>）` | `数据：IUCN Red List（2025）` |
-| Original analysis combining datasets | `数据：<来源 A>；<来源 B>` | `数据：IUCN Red List（2025）、GBIF 发生记录` |
-| Reproduced literature figure | `<作者> et al. (<年>), <期刊缩写> <卷>: <页>, Fig. <n>（<许可>）` | `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1（CC BY 4.0）` |
-| Author's own model output | `数据：<记录来源>；<情景来源>；模型：<算法>` | `数据：GBIF（DOI 10.15468/dl.kmmt73）；模型：RF 与 MaxEnt 集成` |
+| Original analysis on a public dataset | `<来源>（<年份>）` | `IUCN Red List (2025)` |
+| Original analysis combining datasets | `<来源 A>; <来源 B>` | `IUCN Red List (2025); GBIF, via DOI 10.15468/dl.kmmt73` |
+| Reproduced literature figure | `<作者> et al. (<年>), <期刊缩写> <卷>: <页>, Fig. <n>` | `Barbarossa et al. (2021), Nat Commun 12: 1701, Fig. 1` |
+| Author's own model output | `<记录来源>; <情景来源>; <算法>` | `GBIF, via DOI 10.15468/dl.kmmt73; CNCLIM 1 km; RF + MaxEnt` |
 
-- Reproduced figures record the licence and the exact figure number.
+- Reproduced figures record the licence — in the **caption** or the notes, never as a prefix on the source line.
 - Journal, year, volume, and pages use the standard abbreviated form: `Nature 638: 138–145`.
 - Keep the source line in the same position and size on every plate.
 
@@ -281,9 +291,18 @@ Content layer (see `argument-and-titles.md`):
 - one exhibit per slide, directly supporting its title;
 - conclusions slide is last non-appendix slide; no "thank you" ending.
 
+Statistical layer:
+
+- every printed correlation carries a test or an interval, not just the point estimate;
+- any correlation computed over zero-inflated data is accompanied by a two-stage decomposition;
+- any claim of a confounding artefact is accompanied by the stratified test that refutes or confirms it;
+- every sample size printed on a slide states its own filter, and no two pages print different `n` for the same quantity without labelling the difference;
+- an unestimable stratum is reported as unestimable, with the reason.
+
 Then confirm by eye:
 
 - No text overlaps, clipped text, cropped glyphs, or off-slide objects.
+- **No text block sits above the section label's band.** A bottom-anchored title that wraps to two lines overflows upward; check the render, not the build log.
 - No unintended image distortion or cropping.
 - Standard titles share the same x, y, width, height, font size, and color.
 - Repeated column headings and content blocks align exactly — verified by **opening pairs of similar slides side by side**, not one at a time.
@@ -293,9 +312,11 @@ Then confirm by eye:
 - Body text is at least 18 pt and figure labels remain readable.
 - Every figure plate has panel letters where applicable (single-panel figures carry none), and a caption and source **sharing one line** with the source right-flushed.
 - Panel letters sit at each panel's real left edge, not at the requested box edge.
-- No source line contains authorship or reproduction verbs (`作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `Adapted from`, `Courtesy of`, or similar).
+- No source line contains authorship or reproduction verbs (`作者自绘`, `作者制图`, `自制`, `引自`, `改编自`, `Adapted from`, `Courtesy of`, or similar), **nor a category label** (`数据：`, `来源：`, `Source:`).
+- **Figures occupy the dominant share of the plate** — target 75% of the content width with the figure alone on the page. Any page where text and figure are near equal is a defect; move the reading to the caption and notes.
 - Figures fill the space the grid allows. A plate floating in half of its box reads as a small figure.
 - **Distance test**: viewed at 30–40 % size, the title is readable and the figure's key finding is visible without hunting. Axis labels that need to shrink to fit indicate a figure that needs redesigning.
+- **Caption fits one line.** A caption that wraps puts an orphan fragment under the left column while the right column stays empty; shorten the caption instead of shrinking the type.
 - No metric label opens with `的`, `是`, `占`, or `为`.
 - Metric columns beside a figure leave a gutter matching the standard gutter, not a 1.2 in hole.
 - Long titles are shortened before they wrap; if a wrap is essential, enlarge the title box without colliding with content.

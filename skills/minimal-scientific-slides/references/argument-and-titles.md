@@ -103,3 +103,24 @@ Run before building any slide:
 □ Every borrowed exhibit has a verified source line
 □ Conclusions slide is last non-appendix slide
 ```
+
+## 8. The diagnostic spine
+
+A dataset that looks broken is often the deck's best material. When a number looks wrong — a near-zero correlation, an unexpectedly flat trend, a gap between two sources that should agree — do not footnote it. Build the deck around it.
+
+The four-beat structure:
+
+| Beat | Page type | Content |
+|---|---|---|
+| 1. Contradiction | topic title | Two sources describe the same object and disagree. Show the disagreement. |
+| 2. Test | action title | One page per competing explanation, each with the test that discriminates between them |
+| 3. Verdict | action title | What survives the tests, stated with the failing test reported as fully as the passing one |
+| 4. Constraint | action title | "Therefore the method must be X, because Y" — the diagnostic changes a decision |
+
+**Ordering the tests.** Put the test a reviewer will ask for first. A reviewer who suspects name mismatching wants the name-matching test first; a reviewer who suspects sampling bias wants the permutation test first. Getting this wrong reads as either evasive or confused.
+
+**Reporting the failures.** A stratum whose estimate is undefined, a test whose result is the same either way, a null result you expected to be significant — all of it belongs on the slide, with the reason. The credibility of the passing result depends on the failing ones being shown.
+
+**The constraint page is mandatory.** Without beat 4 the diagnostic is a curiosity; with it, it is the reason the method looks the way it does. This is also where a deferral belongs: "this quantity cannot be repaired, therefore we measure a different one."
+
+**Guard against over-reading the diagnosis.** "The data are too sparse to model directly" is a statement about occurrence records. It is not a statement that the species are poorly known — a second, independent line of evidence (an expert range map) can show the opposite, and stating both is stronger than either alone.
