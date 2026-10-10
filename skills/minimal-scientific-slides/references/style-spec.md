@@ -8,9 +8,9 @@ The visual benchmark is a printed journal figure plate: white ground, black ink,
 
 - Slide size: 13.333 × 7.5 in.
 - Background: solid white `#FFFFFF`, with no fill object, gradient, texture, or watermark anywhere on the slide.
-- Standard left margin: 0.75 in.
-- Standard right margin: 0.75 in.
-- Content width: 11.83 in.
+- Standard left margin: 0.72 in.
+- Standard right margin: 0.72 in.
+- Content width: 11.893 in.
 
 ### Shared baseline anchors
 
@@ -18,20 +18,44 @@ Define these once and derive every position from them. Hand-tuned per-slide y va
 
 | Anchor | y (in) | Content |
 |---|---|---|
-| `Y_SECTION` | 0.34 | section label |
-| `Y_TITLE` | 0.70 | slide title, 1–2 lines |
-| `Y_FIG` | 1.50 | figure block top |
-| `Y_NOTE` | 5.62 | caption + source line |
-| `Y_CONCL` | 6.06 | conclusion sentence — **optional**, see §7 |
+| `Y_SECTION` | 0.28 | section label |
+| `Y_TITLE_TOP` | 0.56 | title box top |
+| `Y_TITLE_BOT` | 1.38 | title box bottom — titles are **bottom-aligned** |
+| `Y_FIG` | 1.86 | figure block top |
+| `Y_NOTE` | 6.74 | caption + source line |
 
-`Y_CONCL` is present only on slides using the topic-title structure. On an action-title page the figure simply runs from `Y_FIG` to `NOTE_CUT` and the page ends at the caption line; do not reserve empty space for a conclusion that was deleted.
+`NOTE_CUT = 6.58` — the hard floor. No figure may extend past it. Clamp before the contain fit; a box alone does not keep the figure inside.
 
-Two hard floors, enforced in the placement function:
+**Titles are bottom-aligned to `Y_TITLE_BOT`, not top-aligned.** A top-aligned title leaves a one-line title's figure starting in a different place than a two-line title's. Bottom alignment puts every figure top on the same line regardless of title length.
 
-- `NOTE_CUT = 5.48` — the largest height any figure with a caption may occupy from `Y_FIG`. Clamp before the contain fit; a box alone does not keep the figure inside.
-- `CONCL_CUT = 6.86` — the lowest a conclusion line may reach.
+`Y_CONCL` is gone. On an action-title page there is no conclusion line; the figure runs from `Y_FIG` to `NOTE_CUT` and the page ends at the caption line. Do not reserve space for a conclusion that was deleted.
 
-Keep a clear bottom margin of at least 0.45 in. Align elements to a small number of repeated anchors; do not make each slide's geometry unique.
+Keep a clear bottom margin of at least 0.40 in. Align elements to a small number of repeated anchors; do not make each slide's geometry unique.
+
+### Fill the canvas — aspect ratio drives the layout family
+
+**A page that floats in the middle of its own margins reads as cramped, not minimal.** A figure occupying half its allotted box, with dead space on two sides and 2 in underneath, is a layout defect even though every content rule passes.
+
+**Measure every asset's aspect ratio before choosing a layout family.** Contain-fit against a uniform height cap silently produces different figure widths for different aspect ratios, and the narrow ones end up marooned in white.
+
+Measured ratios from a real deck:
+
+| Ratio | Asset kind | Layout family |
+|---|---|---|
+| ≥ 2.2 | wide map, wide chart | **full content width**, height follows the ratio |
+| 1.5 – 2.0 | mid chart | figure at ~7.4 in + side column |
+| ≤ 1.3 | square plate | figure height-limited; side column absorbs the slack |
+
+The trap: a 2.31-ratio map capped at 3.42 in of height becomes width-limited to 9.4 in and floats in an 11.89 in frame — 1.2 in of dead space per side plus 2.6 in underneath. Giving it the full content width instead raises it to 11.89 in wide and 5.15 in tall, which fills the page.
+
+### Filling vertical space on text-only pages
+
+Fixed y positions with short text leave the gaps *between* the blocks and drag the bottom margin out. Place text by where it actually ends:
+
+- put the primary statement at optical centre, not at a fixed third;
+- set the gap between a block and its follow-up from the block's **rendered line count**, not a guessed step;
+- let the last block run close to the bottom margin rather than stopping a third of the way up;
+- a page of three short items needs larger type and more leading, not more items.
 
 ### Two-column grid
 

@@ -115,8 +115,9 @@ These are cheap and catch the mechanical half:
 - every run: `latin == Arial`, `ea == 黑体`, `srgbClr == 000000`
 - no banned authorship verb in any source line
 - **every picture: `top + height <= NOTE_CUT`** — the assertion that catches the most visible defect
-- caption line and conclusion line at the same y on every slide
+- caption line at the same y on every slide
 - point-size audit per role, printed as a table, compared across slides
+- **airiness audit**: per slide, compute the blank share of the canvas (1 − summed shape area / canvas area), the largest picture's width and height as a percentage of the canvas, and the content bounding box. Flag any slide over roughly 62 % blank, and flag any slide whose bounding box fails to reach the margins. This turns "does it look cramped?" into a number, which is the only reliable way to catch it — the eye accepts a cramped page as deliberate.
 
 Then do the four passes by eye. The assertions are necessary and not sufficient; skipping the eye pass is how a deck with four confirmed bugs ships.
 

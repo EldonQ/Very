@@ -73,11 +73,13 @@ Never mix them on one page. If a slide genuinely needs a concluding sentence, it
 
 ### Figures and text
 
+- **Fill the canvas.** A page floating inside its own margins reads as cramped, not minimal. Measure every asset's aspect ratio first and pick the layout family from it: wide plates (ratio ≥ 2.2) take the **full content width** with height following the ratio; mid charts (1.5–2.0) take a figure plus a side column; square plates (≤ 1.3) are height-limited and the side column absorbs the slack. A uniform height cap applied to mixed ratios strands the narrow figures in white space.
 - Let one figure, chart, or result dominate when visual evidence exists.
 - Prefer one strong number plus a short explanation over dense tables of metrics.
 - Use flat text and images only.
 - Never stretch or distort images. Use contain-style placement by default; crop only when the crop is intentional and preserves the evidence.
 - Give the figure the largest box the grid allows. A figure that floats in half of its allotted box reads as a small figure even when its pixel dimensions are adequate. Low-resolution reproduced figures may be scaled to the full box and accepted slightly soft; a slightly soft full-width plate beats a sharp one at half size.
+- On text-only pages, position by where each block actually **ends**, not by a fixed step. Short text at fixed y positions leaves the gaps between blocks and drags the bottom margin out.
 - Do not reduce body text below the specified minimum. Shorten or split the content instead.
 - Treat any text overlap, awkward wrap, clipped glyph, or inconsistent alignment as a defect.
 
