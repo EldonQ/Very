@@ -54,6 +54,10 @@ The trap: a 2.31-ratio map capped at 3.42 in of height becomes width-limited to 
 
 **Before accepting a plate that uses only half the width, try transposing it.** A vertical bar chart over 7 ordered categories becomes a horizontal bar chart at ratio ≈ 2.8 and then fills the content width instead of 55% of it. Transposition is the fix when a figure is *your own*; a reproduced figure keeps whatever ratio the authors chose.
 
+**The colourbar's orientation is part of the aspect ratio.** A vertical bar plus its title consumes ~40% of a map's width, driving the ratio to ≈ 2.2; the same bar laid horizontally beneath the map costs ~7% of the height and drops the ratio to ≈ 1.5. On a 4.30 in slot the difference is decisive: two side-by-side maps at ratio 2.23 resolve to 2.57 in tall and use 60% of the available height, while at 1.5 they fill it. When a two-panel map plate must occupy a full page, draw both panels into **one** figure with horizontal colourbars rather than placing two separately-rendered images side by side. Keep one colourbar per panel whenever the panels are on different scales — a shared bar would imply a shared quantity.
+
+When setting a figure's height programmatically, derive it from the data box rather than choosing by eye: `ax.set_aspect` locks the drawn map to its true geographic proportions (≈ 1.41 for China), so any surplus height becomes white bands above and below. Figure height = panel width / data ratio + the colourbar block.
+
 **A square plate next to a column is only half a solution** if the column holds one lonely metric — the page then reads as two half-measures. Give the column two or three figures, or move the numbers into the notes and let the plate stand alone at full width.
 
 ### Filling vertical space on text-only pages

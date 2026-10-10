@@ -106,9 +106,20 @@ Run before building any slide:
 
 ## 8. The diagnostic spine
 
-A dataset that looks broken is often the deck's best material. When a number looks wrong — a near-zero correlation, an unexpectedly flat trend, a gap between two sources that should agree — do not footnote it. Build the deck around it.
+A dataset that looks broken is often a deck's best material — but only when the brokenness *is* the finding. Ask that question first, because getting it wrong is the most expensive mistake available: a deck whose title names a problem the audience never asked about reads as evasion, and the real question does not arrive until the last third.
 
-The four-beat structure:
+**The test: would this deck still make sense if the diagnostic turned out to be fine?**
+
+- **Yes, and the diagnostic is still worth a page.** Two independent lines of evidence beat one. Keep the science spine and give the diagnostic one page where it earns its place by changing a decision.
+- **No — the deck collapses without it.** Then it is the spine. Use the four-beat structure below.
+
+A correlation of 0.08 between two species-richness sources is the second case only if the study is *about* measurement disagreement. In a distribution-modelling study it is a **constraint on method selection**, not a result: it answers "why fit habitat instead of occurrences", which is one paragraph in the notes of a methods slide. Promoting it to the cover title inverts the deck's logic — the audience spends the first third on why the inputs are imperfect and arrives at the actual question at slide 12.
+
+The failure mode is specific and worth naming: **the most interesting number in the QC is not automatically the most interesting thing in the science.** Quality control produces diagnostics; the study produces findings. They are different layers, and only the second one is what the audience came for.
+
+When the diagnostic is only a constraint, place it where it does its work — the methods slide's speaker notes, under a heading that states why the model is built the way it is. It reads as rigour rather than as a confession, and it costs a paragraph instead of three pages.
+
+Once the diagnostic has earned the spine, the four-beat structure is:
 
 | Beat | Page type | Content |
 |---|---|---|
