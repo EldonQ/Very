@@ -295,6 +295,15 @@ Content layer (see `argument-and-titles.md`):
 - one exhibit per slide, directly supporting its title;
 - conclusions slide is last non-appendix slide; no "thank you" ending.
 
+**Narration-to-plate check — run this per slide, and do it by opening the render.** For each page, list the claims the script makes in the order it makes them, and for each one name the specific mark on the plate that a listener could point at. Any claim with no corresponding mark is a defect even when the number is correct and the source is cited.
+
+The failure is common because the numbers usually *are* right: they come from the cited paper, just from its text rather than from the figure that happens to be on the slide. A title promising a threat breakdown above a figure showing warming levels reads as a mistake to the audience, and no automated assertion catches it. Two symptoms worth naming:
+
+- the narration says "the figure breaks X down by Y" while the plate shows something else entirely;
+- a printed statistic cannot be read off the plate at all — a median quoted over species, when the figure is aggregated by region, has nowhere on the slide to be found.
+
+When a claim has no matching mark, the fix is normally to **redraw the missing evidence from the source data**, not to weaken the sentence. Extract the relevant column or panel, plot it in the deck's own style, and cite the source figure it came from. Weakening the narration leaves the title unsupported; redrawing makes the page self-supporting.
+
 Statistical layer:
 
 - every printed correlation carries a test or an interval, not just the point estimate;
