@@ -8,7 +8,7 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 
 <br/>
 
-[![Skills](https://img.shields.io/badge/skills-2-4E5963?style=flat-square)](#-技能目录)
+[![Skills](https://img.shields.io/badge/skills-3-4E5963?style=flat-square)](#-技能目录)
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](#)
 [![R](https://img.shields.io/badge/R-276DC3?style=flat-square&logo=r&logoColor=white)](#)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](#-许可)
@@ -23,7 +23,7 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 **Very** 是我的个人 **Skill（技能）仓库**，用来沉淀那些经过打磨、可以反复调用的工作流与工具。
 
 每个技能都遵循统一约定：一个自包含的目录，带 `SKILL.md` 说明、可执行脚本、内置资源与测试，
-**克隆即用、无需额外配置**。目前以科研数据可视化为主，未来会逐步纳入更多方向的技能与工具。
+**克隆即用、无需额外配置**。目前以科研数据可视化与学术汇报产出为主，未来会逐步纳入更多方向的技能与工具。
 
 > 定位：个人技能资产库 —— 让好用的东西可复用、可分享、可持续演进。
 
@@ -35,6 +35,7 @@ _可复用、可组合、开箱即用的 Agent 技能集合_
 |------|------|------|------|
 | [**geo-viz**](skills/geo-viz) | 把栅格数据（GeoTIFF）渲染成出版级中国地图，自动带南海九段线 + 小地图、Nature 级配色、600dpi 透明 PNG + 矢量 PDF | Python / R | ✅ 稳定 |
 | [**gbif-occ**](skills/gbif-occ) | 从 GBIF 大规模下载物种出现记录：把任意类群（含「鱼类」这类非单一节点的并系群）解析为完整 taxonKey、核查分类学全覆盖、异步全量下载并留存 DOI，出数据展示/分析图，附中国四地淡水鱼一键预设 | R | ✅ 稳定 |
+| [**minimal-scientific-slides**](skills/minimal-scientific-slides) | 学术汇报 PPT 的**内容 + 版式 + 复核**体系：论证先行式标题（ghost deck test）、白底黑字、中文黑体 / 西文 Arial、图占 75% 版面、面板字母 + 规范来源行、中英双语讲稿备注，附自动化断言与四轮目视复核清单 | 文档规范 | ✅ 稳定 |
 
 <sub>更多技能开发中，见 [路线图](#-路线图)。</sub>
 
@@ -123,6 +124,46 @@ Rscript skills/gbif-occ/scripts/visualize.R --occ gbif_out/processed/occurrences
 
 ---
 
+## ⭐ 精选：minimal-scientific-slides
+
+> 让学术 PPT 的**论证**立在版式之前 —— 图版式规范 + 论证结构 + 复核清单三件事一起管。
+
+不同于前两个技能，这个技能**不产出图**，它管的是「把证据讲成一场报告」。直接以学术期刊图版为基准：白底、黑字、大面积图、面板字母、规范来源行。它从两个真实科研汇报项目的多轮返工中沉淀，**每一条规则背后都是一次具体的翻车**。
+
+<div align="center">
+
+| 层次 | 管什么 | 关键文件 |
+|---|---|---|
+| **内容层** | 论证主线、行动式标题、结论句冗余、讲稿与图版一致 | `references/argument-and-titles.md` |
+| **版式层** | 共享基线网格、版面家族、图 75% / 文 25%、字体与色板、来源行 | `references/style-spec.md` |
+| **复核层** | 自动化断言 + 四轮目视检查（总览 / 逐页 / 跨页对比 / 距离测试） | `references/visual-review.md` |
+
+</div>
+
+**几条被反复验证的规则**
+
+- 🧭 **标题即论点** —— 每页标题必须是一句完整的结论；只读标题应能讲完整场论证（ghost deck test）。`受胁物种热点与多样性热点在空间上高度重叠` 是标签，`中国淡水鱼适生区的受胁热点与多样性热点重合` 才是发现
+- 🚫 **标题与结论句不得同页** —— 标题已是结论时，下方再写一句结论就是说两遍，这是学术 PPT 读起来啰嗦的头号原因
+- 🖼 **图占 75% 版面** —— 图独占整页，阅读性内容移到图注与讲稿备注；「图一半文一半」视为缺陷
+- 🎯 **色标方向即宽高比** —— 竖置色标约占图宽 40%，横置仅约占图高 7%；双面板地图应合成一张图、色标横置，否则并排后只占六成高度
+- 🔍 **数字必须回源** —— 从图上目测的数字不算数字；类别求和要按源表重算（IUCN 受胁 = CR+EN+VU，**不含 NT**）；比率要用源值而非页面四舍五入值重算；每个 DOI 解析一次
+- 🧪 **校验全绿 ≠ 做对了** —— 自动化断言之后必须逐页导出渲染图目视；讲稿与图版是否一致，只有对着图上标记才能发现
+
+**快速上手**
+
+```bash
+# 读主说明，按 workflow 顺序执行（先定论证主线，再写标题，最后才碰版式）
+cat skills/minimal-scientific-slides/SKILL.md
+
+# 版式常数（共享基线网格 / 版面家族 / 字号色板）单独查
+cat skills/minimal-scientific-slides/references/style-spec.md
+```
+
+> 该技能为**内容无关**的规范体系：它规定「怎么讲、怎么排、怎么查」，不绑定任何学科，
+> 也从源 PPT 中**不复制**任何学科内容、品牌、截图或项目措辞。
+
+---
+
 ## 🗂 仓库结构
 
 ```
@@ -143,6 +184,13 @@ Very/
 │       ├── references/         GBIF 知识与坑位
 │       ├── examples/           真实产物（taxonKey / 引用 DOI / 出现样本 / 实测图 figures/）
 │       └── tests/              自包含冒烟测试
+│   └── minimal-scientific-slides/   学术汇报 PPT 的内容 + 版式 + 复核体系
+│       ├── SKILL.md            主说明（workflow / 不可违背的版式规则）
+│       ├── agents/             openai.yaml
+│       ├── references/         argument-and-titles（论证与标题）
+│       │                       style-spec（基线网格 / 版面家族 / 字体色板 / QA 清单）
+│       │                       visual-review（四轮目视复核）
+│       └── tests/              （暂无；规范类技能以 QA 清单代替冒烟测试）
 ├── .gitignore
 └── README.md
 ```
@@ -183,6 +231,8 @@ Very/
 
 - [x] `geo-viz` — 中国栅格地图渲染（Python + R）
 - [x] `gbif-occ` — GBIF 物种出现记录大规模下载、分类学覆盖核查与数据可视化（R）
+- [x] `minimal-scientific-slides` — 学术汇报 PPT 的论证结构、版式规范与复核体系（文档规范）
+- [ ] `minimal-scientific-slides` 补 `examples/` 与 `tests/`（当前以 QA 清单代替冒烟测试）
 - [ ] 更多科研可视化技能（时序、多面板拼图、专题制图模板）
 - [ ] 数据处理 / 自动化工作流类技能
 - [ ] 技能索引与统一调用入口
